@@ -84,9 +84,12 @@ Route::any('/testclass', [app\controller\IndexController::class, 'test']);
 
 ```php
 namespace app\controller;
+use support\annotation\route\DisableDefaultRoute;
 use support\annotation\route\Get;
 use support\annotation\route\Post;
+use support\annotation\route\Route;
 
+#[DisableDefaultRoute]
 class UserController
 {
     #[Get('/user/{id}')]
@@ -100,10 +103,23 @@ class UserController
     {
         return 'created';
     }
+
+    #[Route('/user/form', ['GET', 'POST'], 'user.form')]
+    public function form()
+    {
+        return 'form';
+    }
 }
 ```
 
 可用注解：`#[Get]` `#[Post]` `#[Put]` `#[Delete]` `#[Patch]` `#[Head]` `#[Options]` `#[Any]`（任意方法）。路径必须以 `/` 开头。第二参数可指定路由名，用于 `route()` 生成 URL。
+
+`#[DisableDefaultRoute]` 表示该控制器禁用默认路由(可选)，仅通过注解定义的路由可访问。
+
+**`#[Route]` 完整用法**：`#[Route(path, methods, name)]`
+- `path`：路由路径，以 `/` 开头；为 `null` 时仅限制默认路由的请求方法，不注册新路由
+- `methods`：HTTP 方法，字符串或字符串数组，如 `'GET'` 或 `['GET','POST']`
+- `name`：路由名，用于 `route('name')` 生成 URL，可省略
 
 ### 无参数注解：限制默认路由的请求方法
 
@@ -147,16 +163,61 @@ class UserController
 
 ### 自定义请求方法与路由名
 
+`#[Route]` 支持自定义多种 HTTP 方法和路由名：
+
 ```php
 use support\annotation\route\Route;
 
 #[Route('/user', ['GET', 'POST'], 'user.form')]
 public function form() { ... }
+
+// 仅指定路径和方法，不含路由名
+#[Route('/user/update', 'PUT')]
+public function update() { ... }
 ```
+
+### 路径参数与正则
+
+注解路由路径支持与 `config/route.php` 相同的参数语法，包括正则与可选参数：
+
+```php
+#[Get('/user/{id:\d+}')]           // 仅匹配数字 id
+public function show($id) { ... }
+
+#[Get('/user[/{name}]')]           // name 为可选，/user 或 /user/xxx
+public function list($name = null) { ... }
+
+#[Any('/user/[{path:.+}]')]        // 匹配 /user 及 /user/ 任意后缀
+public function catchAll($path = null) { ... }
+```
+
+详见本文档「路由参数」章节。
 
 ### 中间件
 
-控制器或方法上的 `#[Middleware]` 会作用于注解路由，用法同 `support\annotation\Middleware`。
+控制器或方法上的 `#[Middleware]` 会作用于注解路由，用法同 `support\annotation\Middleware`：
+
+```php
+use support\annotation\Middleware;
+
+#[Middleware(\app\middleware\AuthMiddleware::class)]
+class UserController { ... }
+
+#[Get('/user/{id}')]
+#[Middleware(\app\middleware\RateLimitMiddleware::class)]
+public function show($id) { ... }
+```
+
+### 与 route() URL 生成的配合
+
+在注解中指定路由名后，可通过 `route('name', $params)` 生成 URL：
+
+```php
+#[Get('/user/{id}', 'user.show')]
+public function show($id) { ... }
+
+// 使用：route('user.show', ['id' => 123])  =>  /user/123
+```
 
 
 ## 路由参数
