@@ -224,7 +224,7 @@ Route::group('/blog', function () {
    Route::any('/view/{id}', function (Request $request, $id) {return response("view $id");});
 });
 ```
-等价与
+等价于
 ```php
 Route::any('/blog/create', function (Request $request) {return response('create');});
 Route::any('/blog/edit', function (Request $request) {return response('edit');});
@@ -245,7 +245,7 @@ Route::group('/blog', function () {
 
 ## 路由中间件
 
-我们可以给某个一个或某一组路由设置中间件。
+我们可以给某个或某一组路由设置中间件。
 例如：
 ```php
 Route::any('/admin', [app\admin\controller\IndexController::class, 'index'])->middleware([
@@ -337,7 +337,7 @@ route('blog.view', ['id' => 100]); // 结果为 /blog/100
 通过`$request->route`对象我们可以获取当前请求路由信息，例如
 
 ```php
-$route = $request->route; // 等价与 $route = request()->route;
+$route = $request->route; // 等价于 $route = request()->route;
 if ($route) {
     var_export($route->getPath());
     var_export($route->getMethods());

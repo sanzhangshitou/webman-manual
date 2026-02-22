@@ -7,6 +7,9 @@ Thành phần dòng lệnh của Webman
 composer require webman/console
 ```
 
+> **Lưu ý**
+> Các lệnh dưới đây dành cho `webman/console` v2.2 trở lên. Nếu thiếu chức năng nào, hãy cập nhật.
+
 ## Mục Lục
 
 ### Sinh Mã

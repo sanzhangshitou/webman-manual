@@ -217,25 +217,26 @@ Résumé des utilisations avancées
 Parfois, le routage contient un préfixe important, dans ce cas, nous pouvons utiliser des groupes de routage pour simplifier la définition. Par exemple :
 ```php
 Route::group('/blog', function () {
-   Route::any('/create', function ($request) {return response('create');});
-   Route::any('/edit', function ($request) {return response('edit');});
-   Route::any('/view/{id}', function ($request, $id) {return response("view $id");});
+   Route::any('/create', function (Request $request) {return response('create');});
+   Route::any('/edit', function (Request $request) {return response('edit');});
+   Route::any('/view/{id}', function (Request $request, $id) {return response("view $id");});
 });
 ```
 Équivalent à :
 ```php
-Route::any('/blog/create', function ($request) {return response('create');});
-Route::any('/blog/edit', function ($request) {return response('edit');});
-Route::any('/blog/view/{id}', function ($request, $id) {return response("view $id");});
+Route::any('/blog/create', function (Request $request) {return response('create');});
+Route::any('/blog/edit', function (Request $request) {return response('edit');});
+Route::any('/blog/view/{id}', function (Request $request, $id) {return response("view $id");});
 ```
 
-Utilisation de groupe imbriqué :
+Utilisation de groupe imbriqué
+
 ```php
 Route::group('/blog', function () {
    Route::group('/v1', function () {
-      Route::any('/create', function ($request) {return response('create');});
-      Route::any('/edit', function ($request) {return response('edit');});
-      Route::any('/view/{id}', function ($request, $id) {return response("view $id");});
+      Route::any('/create', function (Request $request) {return response('create');});
+      Route::any('/edit', function (Request $request) {return response('edit');});
+      Route::any('/view/{id}', function (Request $request, $id) {return response("view $id");});
    });  
 });
 ```
@@ -262,9 +263,9 @@ Route::group('/blog', function () {
 # Exemple d'utilisation incorrect (valable à partir de webman-framework >= 1.5.7)
 Route::group('/blog', function () {
    Route::group('/v1', function () {
-      Route::any('/create', function ($request) {return response('create');});
-      Route::any('/edit', function ($request) {return response('edit');});
-      Route::any('/view/{id}', function ($request, $id) {return response("view $id");});
+      Route::any('/create', function (Request $request) {return response('create');});
+      Route::any('/edit', function (Request $request) {return response('edit');});
+      Route::any('/view/{id}', function (Request $request, $id) {return response("view $id");});
    });  
 })->middleware([
     app\middleware\MiddlewareA::class,
@@ -276,9 +277,9 @@ Route::group('/blog', function () {
 # Exemple d'utilisation correct
 Route::group('/blog', function () {
    Route::group('/v1', function () {
-      Route::any('/create', function ($request) {return response('create');});
-      Route::any('/edit', function ($request) {return response('edit');});
-      Route::any('/view/{id}', function ($request, $id) {return response("view $id");});
+      Route::any('/create', function (Request $request) {return response('create');});
+      Route::any('/edit', function (Request $request) {return response('edit');});
+      Route::any('/view/{id}', function (Request $request, $id) {return response("view $id");});
    })->middleware([
         app\middleware\MiddlewareA::class,
         app\middleware\MiddlewareB::class,

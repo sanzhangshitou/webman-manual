@@ -1,4 +1,4 @@
-## রুট
+# রুট
 ## ডিফল্ট রুটিং নিয়ম
 webman-এর ডিফল্ট রুটিং নিয়ম হল `http://127.0.0.1:8787/{কন্ট্রোলার}/{অ্যাকশন}`.
 
@@ -17,7 +17,7 @@ app
 │   └── v1
 │       └── v2
 │          └── v3
-│               └── কন্ট্রোলার
+│               └── controller
 │                   └── IndexController.php
 └── controller
    ├── v1
@@ -213,28 +213,29 @@ Route::options('[{path:.+}]', function () {
 
 
 ## রুট গ্রুপ
-সময়ের সাথে গুরুত্বপূর্ণ জটিল প্রিফিক্স সম্পূর্ণ করা রুটের পরিবর্তে, রুট গ্রুপ ব্যবহারে আমরা রুটিং সাজাতে পারি। উদাহরণ:
+কখনও কখনও রুটে প্রচুর একই উপসর্গ থাকে, এই ক্ষেত্রে আমরা রুট গ্রুপ ব্যবহার করে সংজ্ঞা সরল করতে পারি। উদাহরণ:
 ```php
-Route::group('/ব্লগ', function () {
-   Route::any('/create', function ($request) {return response('তৈরি করুন');});
-   Route::any('/edit', function ($request) {return response('সম্পাদনা করুন');});
-   Route::any('/view/{id}', function ($request, $id) {return response("$id দেখুন");});
+Route::group('/blog', function () {
+   Route::any('/create', function (Request $request) {return response('create');});
+   Route::any('/edit', function (Request $request) {return response('edit');});
+   Route::any('/view/{id}', function (Request $request, $id) {return response("view $id");});
 });
 ```
-এটি সমান:
+এর সমতুল্য:
 ```php
-Route::any('/ব্লগ/তৈরি', function ($request) {return response('তৈরি করুন');});
-Route::any('/ব্লগ/সম্পাদনা', function ($request) {return response('সম্পাদনা করুন');});
-Route::any('/ব্লগ/দেখুন/{id}', function ($request, $id) {return response("$id দেখুন");});
+Route::any('/blog/create', function (Request $request) {return response('create');});
+Route::any('/blog/edit', function (Request $request) {return response('edit');});
+Route::any('/blog/view/{id}', function (Request $request, $id) {return response("view $id");});
 ```
 
-গ্রুপের ভিতরে গ্রুপ নেস্ট
+গ্রুপ নেস্ট ব্যবহার
+
 ```php
-Route::group('/ব্লগ', function () {
+Route::group('/blog', function () {
    Route::group('/v1', function () {
-      Route::any('/create', function ($request) {return response('তৈরি করুন');});
-      Route::any('/edit', function ($request) {return response('সম্পাদনা করুন');});
-      Route::any('/view/{id}', function ($request, $id) {return response("$id দেখুন");});
+      Route::any('/create', function (Request $request) {return response('create');});
+      Route::any('/edit', function (Request $request) {return response('edit');});
+      Route::any('/view/{id}', function (Request $request, $id) {return response("view $id");});
    });  
 });
 ```
@@ -259,12 +260,12 @@ Route::group('/blog', function () {
 ```
 
 ```php
-# ভুল ব্যবহার উদাহরণ (webman-framework >= 1.5.7 এই ব্যবহার প্রয়োজনীয়)
+# ভুল ব্যবহার উদাহরণ (webman-framework >= 1.5.7 এ এই ব্যবহার বৈধ)
 Route::group('/blog', function () {
    Route::group('/v1', function () {
-      Route::any('/create', function ($request) {return response('create');});
-      Route::any('/edit', function ($request) {return response('edit');});
-      Route::any('/view/{id}', function ($request, $id) {return response("view $id");});
+      Route::any('/create', function (Request $request) {return response('create');});
+      Route::any('/edit', function (Request $request) {return response('edit');});
+      Route::any('/view/{id}', function (Request $request, $id) {return response("view $id");});
    });  
 })->middleware([
     app\middleware\MiddlewareA::class,
@@ -276,9 +277,9 @@ Route::group('/blog', function () {
 # সঠিক ব্যবহার উদাহরণ
 Route::group('/blog', function () {
    Route::group('/v1', function () {
-      Route::any('/create', function ($request) {return response('create');});
-      Route::any('/edit', function ($request) {return response('edit');});
-      Route::any('/view/{id}', function ($request, $id) {return response("view $id");});
+      Route::any('/create', function (Request $request) {return response('create');});
+      Route::any('/edit', function (Request $request) {return response('edit');});
+      Route::any('/view/{id}', function (Request $request, $id) {return response("view $id");});
    })->middleware([
         app\middleware\MiddlewareA::class,
         app\middleware\MiddlewareB::class,

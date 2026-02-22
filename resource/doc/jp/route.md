@@ -8,7 +8,7 @@ webmanのデフォルトのルーティングルールは `http://127.0.0.1:8787
 - `http://127.0.0.1:8787` は `app\controller\IndexController` クラスの `index` メソッドにデフォルトでアクセスします。
 - `http://127.0.0.1:8787/foo` は `app\controller\FooController` クラスの `index` メソッドにデフォルトでアクセスします。
 - `http://127.0.0.1:8787/foo/test` は `app\controller\FooController` クラスの `test` メソッドにデフォルトでアクセスします。
-- `http://127.0.0.1:8787/admin/foo/test` は `app\admin\controller\FooController` クラスの `test` メソッドにデフォルトでアクセスします（[multiple](multiapp.md)を参照）。
+- `http://127.0.0.1:8787/admin/foo/test` は `app\admin\controller\FooController` クラスの `test` メソッドにデフォルトでアクセスします（[複数アプリ](multiapp.md)を参照）。
 
 また、webmanは1.4からより複雑なデフォルトのルーティングをサポートしています。例えば
 ```php
@@ -218,25 +218,26 @@ Route::options('[{path:.+}]', function () {
 時にはルーティングには多くの共通の接頭辞が含まれていることがあります。このような場合は、ルーティンググループを使用して定義を簡素化できます。例：
 ```php
 Route::group('/blog', function () {
-   Route::any('/create', function ($request) {return response('create');});
-   Route::any('/edit', function ($request) {return response('edit');});
-   Route::any('/view/{id}', function ($request, $id) {return response("view $id");});
+   Route::any('/create', function (Request $request) {return response('create');});
+   Route::any('/edit', function (Request $request) {return response('edit');});
+   Route::any('/view/{id}', function (Request $request, $id) {return response("view $id");});
 });
 ```
-次のように同じものになります：
+次と同等です：
 ```php
-Route::any('/blog/create', function ($request) {return response('create');});
-Route::any('/blog/edit', function ($request) {return response('edit');});
-Route::any('/blog/view/{id}', function ($request, $id) {return response("view $id");});
+Route::any('/blog/create', function (Request $request) {return response('create');});
+Route::any('/blog/edit', function (Request $request) {return response('edit');});
+Route::any('/blog/view/{id}', function (Request $request, $id) {return response("view $id");});
 ```
 
-グループのネスト使用例：
+グループのネスト使用
+
 ```php
 Route::group('/blog', function () {
    Route::group('/v1', function () {
-      Route::any('/create', function ($request) {return response('create');});
-      Route::any('/edit', function ($request) {return response('edit');});
-      Route::any('/view/{id}', function ($request, $id) {return response("view $id");});
+      Route::any('/create', function (Request $request) {return response('create');});
+      Route::any('/edit', function (Request $request) {return response('edit');});
+      Route::any('/view/{id}', function (Request $request, $id) {return response("view $id");});
    });  
 });
 ```
@@ -264,9 +265,9 @@ Route::group('/blog', function () {
 # 間違った使用例 (webman-framework >= 1.5.7 からこの方法が有効)
 Route::group('/blog', function () {
    Route::group('/v1', function () {
-      Route::any('/create', function ($request) {return response('create');});
-      Route::any('/edit', function ($request) {return response('edit');});
-      Route::any('/view/{id}', function ($request, $id) {return response("view $id");});
+      Route::any('/create', function (Request $request) {return response('create');});
+      Route::any('/edit', function (Request $request) {return response('edit');});
+      Route::any('/view/{id}', function (Request $request, $id) {return response("view $id");});
    });  
 })->middleware([
     app\middleware\MiddlewareA::class,

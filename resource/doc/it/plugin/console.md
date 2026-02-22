@@ -7,6 +7,9 @@ Componente da riga di comando per Webman
 composer require webman/console
 ```
 
+> **Nota**
+> I comandi seguenti sono per `webman/console` v2.2 e successive. Se mancano alcune funzionalità, aggiorna il pacchetto.
+
 ## Indice
 
 ### Generazione codice

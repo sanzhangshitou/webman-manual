@@ -213,7 +213,6 @@ Resumen de uso avanzado
 A veces, las rutas contienen un gran número de prefijos similares, en estos casos, podemos usar grupos de enrutamiento para simplificar la definición. Por ejemplo:
 
 ```php
-use support\Request;
 Route::group('/blog', function () {
    Route::any('/create', function (Request $request) {return response('create');});
    Route::any('/edit', function (Request $request) {return response('edit');});
@@ -242,14 +241,14 @@ Route::group('/blog', function () {
 Podemos establecer middlewares para una o un grupo de rutas específicas.
 Por ejemplo:
 ```php
-Route::any('/admin', [app\admin\controller\IndexController::class, 'índice'])->middleware([
+Route::any('/admin', [app\admin\controller\IndexController::class, 'index'])->middleware([
     app\middleware\MiddlewareA::class,
     app\middleware\MiddlewareB::class,
 ]);
 
 Route::group('/blog', function () {
-   Route::any('/create', function () {return response('crear');});
-   Route::any('/edit', function () {return response('editar');});
+   Route::any('/create', function () {return response('create');});
+   Route::any('/edit', function () {return response('edit');});
    Route::any('/view/{id}', function ($request, $id) {return response("view $id");});
 })->middleware([
     app\middleware\MiddlewareA::class,
@@ -261,8 +260,8 @@ Route::group('/blog', function () {
 # Ejemplo de uso incorrecto (este uso es válido en webman-framework >= 1.5.7)
 Route::group('/blog', function () {
    Route::group('/v1', function () {
-      Route::any('/create', function (Request $request) {return response('crear');});
-      Route::any('/edit', function (Request $request) {return response('editar');});
+      Route::any('/create', function (Request $request) {return response('create');});
+      Route::any('/edit', function (Request $request) {return response('edit');});
       Route::any('/view/{id}', function (Request $request, $id) {return response("view $id");});
    });  
 })->middleware([
@@ -275,8 +274,8 @@ Route::group('/blog', function () {
 # Ejemplo de uso correcto
 Route::group('/blog', function () {
    Route::group('/v1', function () {
-      Route::any('/create', function (Request $request) {return response('crear');});
-      Route::any('/edit', function (Request $request) {return response('editar');});
+      Route::any('/create', function (Request $request) {return response('create');});
+      Route::any('/edit', function (Request $request) {return response('edit');});
       Route::any('/view/{id}', function (Request $request, $id) {return response("view $id");});
    })->middleware([
         app\middleware\MiddlewareA::class,
@@ -290,22 +289,22 @@ Route::group('/blog', function () {
 Route::resource('/test', app\controller\IndexController::class);
 
 //Ruta de recurso específica
-Route::resource('/test', app\controller\IndexController::class, ['índice','crear']);
+Route::resource('/test', app\controller\IndexController::class, ['index','create']);
 
 //Ruta de recurso no definida
 // Si accede a notify, la dirección será cualquier ruta /test/notify o /test/notify/{id}, y el nombre de la ruta será test.notify
-Route::resource('/test', app\controller\IndexController::class, ['índice','crear','notify']);
+Route::resource('/test', app\controller\IndexController::class, ['index','create','notify']);
 ```
-| Verbo  | URI                 | Acción   | Nombre de la ruta |
-|--------|---------------------|----------|-------------------|
-| GET    | /test               | índice   | test.index        |
-| GET    | /test/crear         | crear    | test.create       |
-| POST   | /test               | almacenar| test.store        |
-| GET    | /test/{id}          | mostrar  | test.show         |
-| GET    | /test/{id}/editar   | editar   | test.edit         |
-| PUT    | /test/{id}          | actualizar| test.update       |
-| DELETE | /test/{id}          | destruir | test.destroy      |
-| PUT    | /test/{id}/recuperación | recuperación | test.recovery |
+| Verbo  | URI                 | Action   | Route Name    |
+|--------|---------------------|----------|---------------|
+| GET    | /test               | index    | test.index    |
+| GET    | /test/create        | create   | test.create   |
+| POST   | /test               | store    | test.store    |
+| GET    | /test/{id}          | show     | test.show     |
+| GET    | /test/{id}/edit     | edit     | test.edit     |
+| PUT    | /test/{id}          | update   | test.update   |
+| DELETE | /test/{id}          | destroy  | test.destroy  |
+| PUT    | /test/{id}/recovery | recovery | test.recovery |
 
 ## Generación de URL
 > **Nota**

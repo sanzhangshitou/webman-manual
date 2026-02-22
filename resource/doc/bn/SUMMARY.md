@@ -24,6 +24,7 @@
   - [লগ](log.md)
   - [কনফিগারেশন ফাইল](config.md)
   - [মাল্টি অ্যাপ্লিকেশন](multiapp.md)
+  - [করুটাইন](coroutine/coroutine.md)
 
 - ডাটাবেস
 
@@ -55,7 +56,7 @@
   - [ইমেজ প্রসেসিং](components/image.md)
   - [ক্যাপচা](components/captcha.md)
   - [ইভেন্ট](components/event.md)
-  - [ইভেন্ট](components/env.md)
+  - [ইনভায়রনমেন্ট ভেরিয়েবল](components/env.md)
   - [ক্রনটাব](components/crontab.md)
   - [এক্সেল শীট](components/excel.md)
   - [ওয়েচ্যাট এসডিকে](components/wechat.md)
@@ -96,18 +97,19 @@
 
   - [কাস্টম প্রসেস](process.md)
   - [ডিপেন্ডেন্সি ইনজেকশান](di.md)
+  - [দ্বিআধারিক প্যাক](others/bin.md)
   - [এএপি](aop.md)
   
 - অন্যান্য
 
   - [নিরাপত্তা](others/security.md)
+  - [ডাটাবেস লেনদেন](others/transaction.md)
   - [ফাংশন নিষেধাজ্ঞা পরীক্ষা](others/disable-function-check.md)
   - [কাস্টম স্ক্রিপ্ট](others/scripts.md)
   - [কাস্টম 404 500](others/custom-error-page.md)
   - [আপগ্রেড পদ্ধতি](others/upgrade.md)
   - [এনজিন প্রক্সি](others/nginx-proxy.md)
   - [ফার প্যাক](others/phar.md)
-  - [দ্বিআধারিক প্যাক](others/bin.md)
   - [শুরু প্রক্রিয়া](others/process.md)
   - [জীবনকাল](others/lifecycle.md)
   - [মেমোরি লিকেজ](others/memory-leak.md)

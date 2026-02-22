@@ -213,7 +213,6 @@ Route::options('[{path:.+}]', function () {
 가끔 라우트에는 많은 동일한 접두어가 포함될 때 라우팅 그룹을 사용하여 정의를 간소화할 수 있습니다. 예를 들어:
 
 ```php
-use support\Request;
 Route::group('/blog', function () {
    Route::any('/create', function (Request $request) {return response('create');});
    Route::any('/edit', function (Request $request) {return response('edit');});

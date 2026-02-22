@@ -24,6 +24,7 @@
   - [लॉग](log.md)
   - [कॉन्फ़िग फ़ाइल](config.md)
   - [बहु-अनुप्रयोग](multiapp.md)
+  - [कॉरूटीन](coroutine/coroutine.md)
 
 - डेटाबेस
 
@@ -91,17 +92,18 @@
 - उच्चावच्छ प्रवेश
   - [कस्टम प्रक्रिया](process.md)
   - [डिपेंडेंसी इन्जेक्शन](di.md)
+  - [बाइनरी पैकेजिंग](others/bin.md)
   - [AOP](aop.md)
   
 - अन्य
   - [सुरक्षा](others/security.md)
+  - [डेटाबेस लेनदेन](others/transaction.md)
   - [फ़ंक्शन निषेध जाँच](others/disable-function-check.md)
   - [कस्टम स्क्रिप्ट](others/scripts.md)
   - [कस्टम 404 500](others/custom-error-page.md)
   - [अपग्रेड मेथड](others/upgrade.md)
   - [nginx प्रॉक्सी](others/nginx-proxy.md)
   - [phar पैकेज](others/phar.md)
-  - [बाइनरी पैकेजिंग](others/bin.md)
   - [प्रारंभ प्रक्रिया](others/process.md)
   - [जीवनकाल](others/lifecycle.md)
   - [मेमोरी लीक](others/memory-leak.md)

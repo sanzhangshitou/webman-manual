@@ -1,14 +1,14 @@
-## Routing
+# Routing
 ## Default Routing Rules
 The default routing rule for webman is  `http://127.0.0.1:8787/{controller}/{action}`.
 
 The default controller is `app\controller\IndexController`, and the default action is `index`.
 
-For example, when accessing:
-- `http://127.0.0.1:8787`, it will by default access the `index` method of the `app\controller\IndexController` class.
-- `http://127.0.0.1:8787/foo`, it will by default access the `index` method of the `app\controller\FooController` class.
-- `http://127.0.0.1:8787/foo/test`, it will by default access the `test` method of the `app\controller\FooController` class.
-- `http://127.0.0.1:8787/admin/foo/test`, it will by default access the `test` method of the `app\admin\controller\FooController` class (see [Multiple Applications](multiapp.md)).
+For example:
+- `http://127.0.0.1:8787` will by default access the `index` method of the `app\controller\IndexController` class.
+- `http://127.0.0.1:8787/foo` will by default access the `index` method of the `app\controller\FooController` class.
+- `http://127.0.0.1:8787/foo/test` will by default access the `test` method of the `app\controller\FooController` class.
+- `http://127.0.0.1:8787/admin/foo/test` will by default access the `test` method of the `app\admin\controller\FooController` class (see [Multiple Applications](multiapp.md)).
 
 Additionally, starting from webman 1.4, it supports more complex default routing, such as
 ```php
@@ -35,7 +35,7 @@ Route::disableDefaultRoute();
 ```
 
 ## Closure Routes
-Add the following route code to `config/route.php`:
+Add the following routing code to `config/route.php`:
 ```php
 use support\Request;
 Route::any('/test', function (Request $request) {
@@ -46,7 +46,7 @@ Route::any('/test', function (Request $request) {
 > **Note**
 > Because closure functions do not belong to any controller, `$request->app`, `$request->controller`, and `$request->action` are all empty strings.
 
-When accessing the address `http://127.0.0.1:8787/test`, it will return the string `test`.
+When accessing `http://127.0.0.1:8787/test`, it will return the string `test`.
 
 > **Note**
 > The route path must start with `/`, for example:
@@ -66,12 +66,12 @@ Route::any('/test', function (Request $request) {
 
 
 ## Class Routes
-Add the following route code to `config/route.php`:
+Add the following routing code to `config/route.php`:
 ```php
 Route::any('/testclass', [app\controller\IndexController::class, 'test']);
 ```
 
-When accessing the address `http://127.0.0.1:8787/testclass`, it will return the result of the `test` method of the `app\controller\IndexController` class.
+When accessing `http://127.0.0.1:8787/testclass`, it will return the result of the `test` method of the `app\controller\IndexController` class.
 
 
 ## Annotation Routing
@@ -219,25 +219,26 @@ Sometimes, routes contain a lot of the same prefixes. In this case, we can use r
 
 ```php
 Route::group('/blog', function () {
-   Route::any('/create', function ($request) {return response('create');});
-   Route::any('/edit', function ($request) {return response('edit');});
-   Route::any('/view/{id}', function ($request, $id) {return response("view $id");});
+   Route::any('/create', function (Request $request) {return response('create');});
+   Route::any('/edit', function (Request $request) {return response('edit');});
+   Route::any('/view/{id}', function (Request $request, $id) {return response("view $id");});
 });
 ```
 Equivalent to
 ```php
-Route::any('/blog/create', function ($request) {return response('create');});
-Route::any('/blog/edit', function ($request) {return response('edit');});
-Route::any('/blog/view/{id}', function ($request, $id) {return response("view $id");});
+Route::any('/blog/create', function (Request $request) {return response('create');});
+Route::any('/blog/edit', function (Request $request) {return response('edit');});
+Route::any('/blog/view/{id}', function (Request $request, $id) {return response("view $id");});
 ```
 
 Nested group usage
+
 ```php
 Route::group('/blog', function () {
    Route::group('/v1', function () {
-      Route::any('/create', function ($request) {return response('create');});
-      Route::any('/edit', function ($request) {return response('edit');});
-      Route::any('/view/{id}', function ($request, $id) {return response("view $id");});
+      Route::any('/create', function (Request $request) {return response('create');});
+      Route::any('/edit', function (Request $request) {return response('edit');});
+      Route::any('/view/{id}', function (Request $request, $id) {return response("view $id");});
    });  
 });
 ```
@@ -264,9 +265,9 @@ Route::group('/blog', function () {
 # Incorrect usage example (valid in webman-framework >= 1.5.7)
 Route::group('/blog', function () {
    Route::group('/v1', function () {
-      Route::any('/create', function ($request) {return response('create');});
-      Route::any('/edit', function ($request) {return response('edit');});
-      Route::any('/view/{id}', function ($request, $id) {return response("view $id");});
+      Route::any('/create', function (Request $request) {return response('create');});
+      Route::any('/edit', function (Request $request) {return response('edit');});
+      Route::any('/view/{id}', function (Request $request, $id) {return response("view $id");});
    });  
 })->middleware([
     app\middleware\MiddlewareA::class,
@@ -278,9 +279,9 @@ Route::group('/blog', function () {
 # Correct usage example
 Route::group('/blog', function () {
    Route::group('/v1', function () {
-      Route::any('/create', function ($request) {return response('create');});
-      Route::any('/edit', function ($request) {return response('edit');});
-      Route::any('/view/{id}', function ($request, $id) {return response("view $id");});
+      Route::any('/create', function (Request $request) {return response('create');});
+      Route::any('/edit', function (Request $request) {return response('edit');});
+      Route::any('/view/{id}', function (Request $request, $id) {return response("view $id");});
    })->middleware([
         app\middleware\MiddlewareA::class,
         app\middleware\MiddlewareB::class,
@@ -320,11 +321,11 @@ Route::any('/blog/{id}', [app\controller\BlogController::class, 'view'])->name('
 ```
 We can use the following method to generate the URL for this route:
 ```php
-route('blog.view', ['id' => 100]); // Result is /blog/100
+route('blog.view', ['id' => 100]); // Result: /blog/100
 ```
 
 When using route URLs in a view, this method can be used so that regardless of changes to the routing rules, the URL will be generated automatically, avoiding the need to modify a large number of view files due to changes in route addresses.
-## Obtain Route Information
+## Get Route Information
 
 We can obtain the current request route information through the `$request->route` object, for example:
 
@@ -359,7 +360,7 @@ Route::fallback(function(){
 });
 ```
 
-## Add Middleware to 404
+## Add Middleware to 404 Requests
 
 By default, 404 requests do not go through any middleware. If you need to add middleware to 404 requests, refer to the following code.
 ```php

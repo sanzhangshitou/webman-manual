@@ -7,6 +7,9 @@ Componente de linha de comando do Webman
 composer require webman/console
 ```
 
+> **Nota**
+> Os comandos abaixo são para `webman/console` v2.2 ou superior. Se faltarem algumas funcionalidades, atualize o pacote.
+
 ## Índice
 
 ### Geração de Código

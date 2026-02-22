@@ -24,6 +24,7 @@
   - [Registo](log.md)
   - [Ficheiros de configuração](config.md)
   - [Multiaplicação](multiapp.md)
+  - [Coroutine](coroutine/coroutine.md)
 
 - Base de dados
 
@@ -92,17 +93,18 @@
 
   - [Processo personalizado](process.md)
   - [Injeção de dependência](di.md)
+  - [Empacotamento binário](others/bin.md)
   - [AOP](aop.md)
   
 - Outros
   - [Segurança](others/security.md)
+  - [Transações de banco de dados](others/transaction.md)
   - [Verificação de funções desativadas](others/disable-function-check.md)
   - [Script personalizado](others/scripts.md)
   - [Página de erro personalizada 404 500](others/custom-error-page.md)
   - [Métodos de atualização](others/upgrade.md)
   - [Proxy nginx](others/nginx-proxy.md)
   - [Empacotamento phar](others/phar.md)
-  - [Empacotamento binário](others/bin.md)
   - [Processo de inicialização](others/process.md)
   - [Ciclo de vida](others/lifecycle.md)
   - [Vazamento de memória](others/memory-leak.md)

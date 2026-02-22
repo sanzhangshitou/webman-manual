@@ -7,6 +7,9 @@ Webman-Befehlszeilenkomponente
 composer require webman/console
 ```
 
+> **Hinweis**
+> Die folgenden Befehle gelten für `webman/console` v2.2 und höher. Falls einige Funktionen fehlen, bitte aktualisieren.
+
 ## Inhaltsverzeichnis
 
 ### Code-Generierung

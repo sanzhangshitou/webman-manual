@@ -22,6 +22,7 @@
   - [บันทึก](log.md)
   - [ไฟล์กำหนดค่า](config.md)
   - [แอปพลิเคชันหลายรายการ](multiapp.md)
+  - [Coroutine](coroutine/coroutine.md)
 
 - ฐานข้อมูล
   - [เริ่มต้นอย่างรวดเร็ว](db/tutorial.md)
@@ -88,17 +89,18 @@
 - ขั้นสูง
   - [กระบวนการที่กำหนดเอง](process.md)
   - [ฝังตัวแฟรมเวิร์ก](di.md)
+  - [การแพ็คเกจแบบไบนารี](others/bin.md)
   - [AOP](aop.md)
   
 - อื่น ๆ
   - [ความปลอดภัย](others/security.md)
+  - [ธุรกรรมฐานข้อมูล](others/transaction.md)
   - [การตรวจสอบการปิดใช้งานฟังก์ชัน](others/disable-function-check.md)
   - [สคริปต์ที่กำหนดเอง](others/scripts.md)
   - [การปรับแต่งหน้าข้อผิดพลาด 404 และ 500](others/custom-error-page.md)
   - [วิธีการอัพเกรด](others/upgrade.md)
   - [nginx พร็อกซี](others/nginx-proxy.md)
   - [phar แพ็คเกจ](others/phar.md)
-  - [การแพ็คเกจแบบไบนารี](others/bin.md)
   - [กระบวนการเริ่มต้น](others/process.md)
   - [ชีวิตของโปรแกรม](others/lifecycle.md)
   - [การรั่วหล่อเพียงข้อมูล](others/memory-leak.md)

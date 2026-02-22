@@ -213,17 +213,16 @@ Riepilogo utilizzo avanzato
 A volte i percorsi di routing contengono molti prefissi comuni, in questo caso possiamo utilizzare i gruppi di routing per semplificarne la definizione. Ad esempio:
 
 ```php
-use support\Request;
 Route::group('/blog', function () {
-   Route::any('/create', function (Request $request) {return response('crea');});
-   Route::any('/edit', function (Request $request) {return response('modifica');});
+   Route::any('/create', function (Request $request) {return response('create');});
+   Route::any('/edit', function (Request $request) {return response('edit');});
    Route::any('/view/{id}', function (Request $request, $id) {return response("view $id");});
 });
 ```
 equivalente a
 ```php
-Route::any('/blog/create', function (Request $request) {return response('crea');});
-Route::any('/blog/edit', function (Request $request) {return response('modifica');});
+Route::any('/blog/create', function (Request $request) {return response('create');});
+Route::any('/blog/edit', function (Request $request) {return response('edit');});
 Route::any('/blog/view/{id}', function (Request $request, $id) {return response("view $id");});
 ```
 
@@ -232,8 +231,8 @@ Utilizzo nidificato del gruppo
 ```php
 Route::group('/blog', function () {
    Route::group('/v1', function () {
-      Route::any('/create', function (Request $request) {return response('crea');});
-      Route::any('/edit', function (Request $request) {return response('modifica');});
+      Route::any('/create', function (Request $request) {return response('create');});
+      Route::any('/edit', function (Request $request) {return response('edit');});
       Route::any('/view/{id}', function (Request $request, $id) {return response("view $id");});
    });  
 });
@@ -249,8 +248,8 @@ Route::any('/admin', [app\admin\controller\IndexController::class, 'index'])->mi
 ]);
 
 Route::group('/blog', function () {
-   Route::any('/create', function () {return response('crea');});
-   Route::any('/edit', function () {return response('modifica');});
+   Route::any('/create', function () {return response('create');});
+   Route::any('/edit', function () {return response('edit');});
    Route::any('/view/{id}', function ($request, $id) {return response("view $id");});
 })->middleware([
     app\middleware\MiddlewareA::class,
@@ -262,8 +261,8 @@ Route::group('/blog', function () {
 # Esempio di utilizzo errato (valido nella versione webman-framework >= 1.5.7)
 Route::group('/blog', function () {
    Route::group('/v1', function () {
-      Route::any('/create', function (Request $request) {return response('crea');});
-      Route::any('/edit', function (Request $request) {return response('modifica');});
+      Route::any('/create', function (Request $request) {return response('create');});
+      Route::any('/edit', function (Request $request) {return response('edit');});
       Route::any('/view/{id}', function (Request $request, $id) {return response("view $id");});
    });  
 })->middleware([
@@ -276,8 +275,8 @@ Route::group('/blog', function () {
 # Esempio di utilizzo corretto
 Route::group('/blog', function () {
    Route::group('/v1', function () {
-      Route::any('/create', function (Request $request) {return response('crea');});
-      Route::any('/edit', function (Request $request) {return response('modifica');});
+      Route::any('/create', function (Request $request) {return response('create');});
+      Route::any('/edit', function (Request $request) {return response('edit');});
       Route::any('/view/{id}', function (Request $request, $id) {return response("view $id");});
    })->middleware([
         app\middleware\MiddlewareA::class,

@@ -228,7 +228,6 @@ Route::options('[{path:.+}]', function () {
 ## กลุ่มเส้นทาง
 บางครั้งเส้นทางประกอบด้วยคำขึ้นต้นที่มีจำนวนมาก เราสามารถใช้กลุ่มเส้นทางเพื่อกำหนดให้ง่ายขึ้น เช่น:
 ```php
-use support\Request;
 Route::group('/blog', function () {
    Route::any('/create', function (Request $request) {return response('create');});
    Route::any('/edit', function (Request $request) {return response('edit');});

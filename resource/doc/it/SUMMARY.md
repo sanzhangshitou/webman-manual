@@ -24,6 +24,7 @@
   - [Log](log.md)
   - [File di configurazione](config.md)
   - [Applicazioni multiple](multiapp.md)
+  - [Coroutine](coroutine/coroutine.md)
 
 - Database
 
@@ -91,17 +92,18 @@
 - Avanzamento avanzato
   - [Processi personalizzati](process.md)
   - [Iniezione delle dipendenze](di.md)
+  - [Pacchetto binario](others/bin.md)
   - [AOP](aop.md)
   
 - Altro
   - [Sicurezza](others/security.md)
+  - [Transazioni di database](others/transaction.md)
   - [Controllo delle funzioni disabilitate](others/disable-function-check.md)
   - [Script personalizzati](others/scripts.md)
   - [Personalizzazione delle pagine di errore 404 e 500](others/custom-error-page.md)
   - [Metodo di aggiornamento](others/upgrade.md)
   - [Proxy nginx](others/nginx-proxy.md)
   - [Pacchetto Phar](others/phar.md)
-  - [Pacchetto binario](others/bin.md)
   - [Processo di avvio](others/process.md)
   - [Ciclo di vita](others/lifecycle.md)
   - [Perdita di memoria](others/memory-leak.md)

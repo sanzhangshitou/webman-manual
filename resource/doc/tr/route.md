@@ -215,7 +215,6 @@ Gelişmiş kullanım özeti
 Bazı durumlarda yönlendirme büyük miktarda aynı ön ek içerir, bu durumda yönlendirme grupları kullanarak tanımlamayı basitleştirebiliriz. Örneğin:
 
 ```php
-use support\Request;
 Route::group('/blog', function () {
    Route::any('/create', function (Request $request) {return response('create');});
    Route::any('/edit', function (Request $request) {return response('edit');});

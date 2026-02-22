@@ -7,6 +7,9 @@ Webman 命令行組件
 composer require webman/console
 ```
 
+> **注意**
+> 以下命令適用於 `webman/console` v2.2 及以上版本，若你的 console 缺少某些功能，請及時更新。
+
 ## 目錄
 
 ### 程式碼生成

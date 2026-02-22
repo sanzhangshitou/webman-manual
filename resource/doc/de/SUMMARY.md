@@ -24,6 +24,7 @@
   - [Protokoll](log.md)
   - [Konfigurationsdatei](config.md)
   - [Mehrere Anwendungen](multiapp.md)
+  - [Koroutine](coroutine/coroutine.md)
 
 - Datenbank
 
@@ -91,17 +92,18 @@
 - Fortgeschrittene Themen
   - [Benutzerdefinierte Prozesse](process.md)
   - [Abhängigkeitsinjektion](di.md)
+  - [Binäre Paketierung](others/bin.md)
   - [AOP](aop.md)
   
 - Sonstiges
   - [Sicherheit](others/security.md)
+  - [Datenbanktransaktionen](others/transaction.md)
   - [Überprüfung nicht erlaubter Funktionen](others/disable-function-check.md)
   - [Benutzerdefiniertes Skript](others/scripts.md)
   - [Benutzerdefinierte 404- und 500-Fehlerseiten](others/custom-error-page.md)
   - [Upgrade-Methode](others/upgrade.md)
   - [nginx-Proxy](others/nginx-proxy.md)
   - [phar-Paketierung](others/phar.md)
-  - [Binäre Paketierung](others/bin.md)
   - [Startprozess](others/process.md)
   - [Lebenszyklus](others/lifecycle.md)
   - [Speicherleckage](others/memory-leak.md)

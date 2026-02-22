@@ -7,6 +7,9 @@ Webman コマンドラインコンポーネント
 composer require webman/console
 ```
 
+> **注意**
+> 以下のコマンドは `webman/console` v2.2 以上を対象としています。一部の機能が使えない場合は、アップデートしてください。
+
 ## 目次
 
 ### コード生成

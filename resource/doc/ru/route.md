@@ -1,4 +1,4 @@
-## Маршрутизация
+# Маршрутизация
 ## Стандартные правила маршрутизации
 Стандартным правилом маршрутизации для webman является `http://127.0.0.1:8787/{контроллер}/{действие}`.
 
@@ -213,7 +213,6 @@ Route::options('[{path:.+}]', function () {
 ## Группировка маршрутов
 Иногда маршруты содержат много общих префиксов, в таком случае можно использовать группировку маршрутов для упрощения определения. Например:
 ```php
-use support\Request;
 Route::group('/blog', function () {
    Route::any('/create', function (Request $request) {return response('create');});
    Route::any('/edit', function (Request $request) {return response('edit');});

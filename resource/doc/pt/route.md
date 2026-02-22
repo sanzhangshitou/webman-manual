@@ -214,7 +214,6 @@ Resumo de uso avançado
 Às vezes, as rotas contêm um grande número de prefixos semelhantes, nesses casos, podemos usar grupos de rotas para simplificar a definição. Por exemplo:
 
 ```php
-use support\Request;
 Route::group('/blog', function () {
    Route::any('/create', function (Request $request) {return response('create');});
    Route::any('/edit', function (Request $request) {return response('edit');});
@@ -284,7 +283,7 @@ Route::group('/blog', function () {
    })->middleware([
         app\middleware\MiddlewareA::class,
         app\middleware\MiddlewareB::class,
-    });  
+    ]);  
 });
 ```
 ## Roteamento de Recursos

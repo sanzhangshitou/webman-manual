@@ -245,7 +245,7 @@ Route::group('/blog', function () {
 
 ## 路由中間件
 
-我們可以給某個一個或某一組路由設置中間件。
+我們可以給某個或某一組路由設置中間件。
 例如：
 ```php
 Route::any('/admin', [app\admin\controller\IndexController::class, 'index'])->middleware([

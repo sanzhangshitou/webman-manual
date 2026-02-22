@@ -24,6 +24,7 @@
   - [Nhật ký](log.md)
   - [Tập tin cấu hình](config.md)
   - [Nhiều ứng dụng](multiapp.md)
+  - [Coroutine](coroutine/coroutine.md)
 
 - Cơ sở dữ liệu
 
@@ -96,18 +97,19 @@
 
   - [Tiến trình tùy chỉnh](process.md)
   - [Tiêm phụ thuộc](di.md)
+  - [Đóng gói nhị phân](others/bin.md)
   - [AOP](aop.md)
 
 - Khác
 
   - [Bảo mật](others/security.md)
+  - [Giao dịch cơ sở dữ liệu](others/transaction.md)
   - [Kiểm tra cấm chức năng](others/disable-function-check.md)
   - [Tùy chỉnh tập lệnh](others/scripts.md)
   - [Tùy chỉnh 404 500](others/custom-error-page.md)
   - [Phương pháp nâng cấp](others/upgrade.md)
   - [Proxy nginx](others/nginx-proxy.md)
   - [Đóng gói phar](others/phar.md)
-  - [Đóng gói nhị phân](others/bin.md)
   - [Quy trình khởi động](others/process.md)
   - [Vòng đời](others/lifecycle.md)
   - [Rò rỉ bộ nhớ](others/memory-leak.md)

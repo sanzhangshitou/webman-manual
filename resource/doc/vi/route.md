@@ -217,7 +217,6 @@ Tóm tắt sử dụng nâng cao
 Đôi khi định tuyến bao gồm một số tiền tố giống nhau, trong trường hợp này, chúng ta có thể sử dụng nhóm định tuyến để đơn giản hóa định nghĩa. Ví dụ:
 
 ```php
-use support\Request;
 Route::group('/blog', function () {
    Route::any('/create', function (Request $request) {return response('create');});
    Route::any('/edit', function (Request $request) {return response('edit');});

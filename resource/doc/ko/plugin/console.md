@@ -7,6 +7,9 @@ Webman 명령줄 컴포넌트
 composer require webman/console
 ```
 
+> **참고**
+> 아래 명령은 `webman/console` v2.2 이상 버전을 대상으로 합니다. 일부 기능이 없다면 업데이트해 주세요.
+
 ## 목차
 
 ### 코드 생성

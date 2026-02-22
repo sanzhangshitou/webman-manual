@@ -7,6 +7,9 @@ Webman komut satırı bileşeni
 composer require webman/console
 ```
 
+> **Not**
+> Aşağıdaki komutlar `webman/console` v2.2 ve üzeri için geçerlidir. Bazı özellikler eksikse lütfen güncelleyin.
+
 ## İçindekiler
 
 ### Kod Üretimi
