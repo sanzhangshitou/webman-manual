@@ -81,9 +81,12 @@ Route::any('/testclass', [app\controller\IndexController::class, 'test']);
 
 ```php
 namespace app\controller;
+use support\annotation\route\DisableDefaultRoute;
 use support\annotation\route\Get;
 use support\annotation\route\Post;
+use support\annotation\route\Route;
 
+#[DisableDefaultRoute]
 class UserController
 {
     #[Get('/user/{id}')]
@@ -97,10 +100,23 @@ class UserController
     {
         return 'created';
     }
+
+    #[Route('/user/form', ['GET', 'POST'], 'user.form')]
+    public function form()
+    {
+        return 'form';
+    }
 }
 ```
 
-Доступные аннотации: `#[Get]` `#[Post]` `#[Put]` `#[Delete]` `#[Patch]` `#[Head]` `#[Options]` `#[Any]` (любой метод). Путь должен начинаться с `/`. Второй параметр может указывать имя маршрута, используемое в `route()` для генерации URL.
+Доступные аннотации: `#[Get]` `#[Post]` `#[Put]` `#[Delete]` `#[Patch]` `#[Head]` `#[Options]` `#[Any]` (любой метод). Путь должен начинаться с `/`. Второй параметр может указывать имя маршрута для `route()` при генерации URL.
+
+`#[DisableDefaultRoute]` отключает маршрутизацию по умолчанию для контроллера (необязательно); доступны только маршруты, определённые аннотациями.
+
+**Полный синтаксис `#[Route]`**: `#[Route(path, methods, name)]`
+- `path`: путь маршрута, начинается с `/`; при `null` только ограничивает HTTP-методы маршрута по умолчанию без регистрации нового маршрута
+- `methods`: HTTP-метод(ы), строка или массив строк, напр. `'GET'` или `['GET','POST']`
+- `name`: имя маршрута для `route('name')` при генерации URL, можно опустить
 
 ### Аннотации без параметров: ограничение HTTP-метода маршрута по умолчанию
 
@@ -144,16 +160,61 @@ class UserController
 
 ### Пользовательские HTTP-методы и имя маршрута
 
+`#[Route]` поддерживает несколько HTTP-методов и имя маршрута:
+
 ```php
 use support\annotation\route\Route;
 
 #[Route('/user', ['GET', 'POST'], 'user.form')]
 public function form() { ... }
+
+// Только путь и метод, без имени маршрута
+#[Route('/user/update', 'PUT')]
+public function update() { ... }
 ```
+
+### Параметры пути и regex
+
+Пути маршрутов с аннотациями поддерживают тот же синтаксис параметров, что и `config/route.php`, включая regex и опциональные параметры:
+
+```php
+#[Get('/user/{id:\d+}')]           // Только числовой id
+public function show($id) { ... }
+
+#[Get('/user[/{name}]')]           // name опционален: /user или /user/xxx
+public function list($name = null) { ... }
+
+#[Any('/user/[{path:.+}]')]        // Совпадение с /user и /user/ с любым суффиксом
+public function catchAll($path = null) { ... }
+```
+
+Подробнее см. раздел «Параметры маршрута» в этом документе.
 
 ### Промежуточное ПО
 
-`#[Middleware]` в контроллере или методе применяется к маршрутам с аннотациями, используется как `support\annotation\Middleware`.
+`#[Middleware]` в контроллере или методе применяется к маршрутам с аннотациями; использование как у `support\annotation\Middleware`:
+
+```php
+use support\annotation\Middleware;
+
+#[Middleware(\app\middleware\AuthMiddleware::class)]
+class UserController { ... }
+
+#[Get('/user/{id}')]
+#[Middleware(\app\middleware\RateLimitMiddleware::class)]
+public function show($id) { ... }
+```
+
+### Генерация URL с route()
+
+При указании имени маршрута в аннотации используйте `route('name', $params)` для генерации URL:
+
+```php
+#[Get('/user/{id}', 'user.show')]
+public function show($id) { ... }
+
+// Использование: route('user.show', ['id' => 123])  =>  /user/123
+```
 
 ## Параметры маршрута
 Если в маршруте присутствуют параметры, они могут быть сопоставлены с помощью `{ключ}` и переданы в соответствующие аргументы метода контроллера (начиная со второго аргумента), например:

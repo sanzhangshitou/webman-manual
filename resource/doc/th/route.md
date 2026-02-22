@@ -97,9 +97,12 @@ Route::any('/testclass', [app\controller\IndexController::class, 'test']);
 
 ```php
 namespace app\controller;
+use support\annotation\route\DisableDefaultRoute;
 use support\annotation\route\Get;
 use support\annotation\route\Post;
+use support\annotation\route\Route;
 
+#[DisableDefaultRoute]
 class UserController
 {
     #[Get('/user/{id}')]
@@ -113,10 +116,23 @@ class UserController
     {
         return 'created';
     }
+
+    #[Route('/user/form', ['GET', 'POST'], 'user.form')]
+    public function form()
+    {
+        return 'form';
+    }
 }
 ```
 
 แอนโนเทชันที่ใช้ได้: `#[Get]` `#[Post]` `#[Put]` `#[Delete]` `#[Patch]` `#[Head]` `#[Options]` `#[Any]` (วิธีใดก็ได้) เส้นทางต้องขึ้นต้นด้วย `/` พารามิเตอร์ที่สองสามารถระบุชื่อเส้นทาง สำหรับ `route()` สร้าง URL
+
+`#[DisableDefaultRoute]` หมายถึงปิดเส้นทางเริ่มต้นของ controller นี้ (เลือกได้) เข้าถึงได้เฉพาะเส้นทางที่กำหนดโดยแอนโนเทชันเท่านั้น
+
+**ไวยากรณ์เต็ม `#[Route]`**: `#[Route(path, methods, name)]`
+- `path`: เส้นทาง ขึ้นต้นด้วย `/` เมื่อเป็น `null` จะจำกัดเฉพาะวิธี HTTP ของเส้นทางเริ่มต้นโดยไม่ลงทะเบียนเส้นทางใหม่
+- `methods`: วิธี HTTP สตริงหรืออาร์เรย์สตริง เช่น `'GET'` หรือ `['GET','POST']`
+- `name`: ชื่อเส้นทางสำหรับ `route('name')` สร้าง URL ข้ามได้
 
 ### แอนโนเทชันไม่มีพารามิเตอร์: จำกัดวิธี HTTP ของเส้นทางเริ่มต้น
 
@@ -160,16 +176,61 @@ class UserController
 
 ### วิธี HTTP ที่กำหนดเองและชื่อเส้นทาง
 
+`#[Route]` รองรับหลายวิธี HTTP และชื่อเส้นทาง:
+
 ```php
 use support\annotation\route\Route;
 
 #[Route('/user', ['GET', 'POST'], 'user.form')]
 public function form() { ... }
+
+// ระบุเฉพาะเส้นทางและวิธี ไม่มีชื่อเส้นทาง
+#[Route('/user/update', 'PUT')]
+public function update() { ... }
 ```
+
+### พารามิเตอร์เส้นทางและ regex
+
+เส้นทางแอนโนเทชันรองรับไวยากรณ์พารามิเตอร์เดียวกับ `config/route.php` รวม regex และพารามิเตอร์เสริม:
+
+```php
+#[Get('/user/{id:\d+}')]           // เฉพาะ id ตัวเลข
+public function show($id) { ... }
+
+#[Get('/user[/{name}]')]           // name เลือกได้ /user หรือ /user/xxx
+public function list($name = null) { ... }
+
+#[Any('/user/[{path:.+}]')]        // ตรงกับ /user และ /user/ ด้วยส่วนต่อท้ายใดๆ
+public function catchAll($path = null) { ... }
+```
+
+ดูส่วน「พารามิเตอร์ของเส้นทาง」ในเอกสารนี้
 
 ### มิดเดิลแวร์
 
-`#[Middleware]` บน controller หรือ method จะส่งผลต่อเส้นทางแอนโนเทชัน ใช้เหมือน `support\annotation\Middleware`
+`#[Middleware]` บน controller หรือ method จะส่งผลต่อเส้นทางแอนโนเทชัน ใช้เหมือน `support\annotation\Middleware`:
+
+```php
+use support\annotation\Middleware;
+
+#[Middleware(\app\middleware\AuthMiddleware::class)]
+class UserController { ... }
+
+#[Get('/user/{id}')]
+#[Middleware(\app\middleware\RateLimitMiddleware::class)]
+public function show($id) { ... }
+```
+
+### การสร้าง URL ด้วย route()
+
+เมื่อระบุชื่อเส้นทางในแอนโนเทชัน ใช้ `route('name', $params)` เพื่อสร้าง URL:
+
+```php
+#[Get('/user/{id}', 'user.show')]
+public function show($id) { ... }
+
+// การใช้: route('user.show', ['id' => 123])  =>  /user/123
+```
 
 ## พารามิเตอร์ของเส้นทาง
 หากมีพารามิเตอร์ในเส้นทาง ใช้ `{key}` เพื่อตรงคู่ค่า ผลลัพธ์ที่ตรงจะถูกส่งไปยังพารามิเตอร์ของวิธีควบคุมที่เกี่ยวข้อง (เริ่มจากพารามิเตอร์ที่สองขึ้นไปตามลำดับ) เช่น: 

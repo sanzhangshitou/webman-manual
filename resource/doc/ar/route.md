@@ -84,9 +84,12 @@ Route::any('/testclass', [app\controller\IndexController::class, 'test']);
 
 ```php
 namespace app\controller;
+use support\annotation\route\DisableDefaultRoute;
 use support\annotation\route\Get;
 use support\annotation\route\Post;
+use support\annotation\route\Route;
 
+#[DisableDefaultRoute]
 class UserController
 {
     #[Get('/user/{id}')]
@@ -100,10 +103,23 @@ class UserController
     {
         return 'created';
     }
+
+    #[Route('/user/form', ['GET', 'POST'], 'user.form')]
+    public function form()
+    {
+        return 'form';
+    }
 }
 ```
 
 التعليقات التوضيحية المتاحة: `#[Get]` `#[Post]` `#[Put]` `#[Delete]` `#[Patch]` `#[Head]` `#[Options]` `#[Any]` (أي طريقة). يجب أن تبدأ المسارات بـ `/`. يمكن للبارامتر الثاني تحديد اسم المسار لاستخدامه في `route()` لتوليد الرابط.
+
+`#[DisableDefaultRoute]` يعطّل التوجيه الافتراضي للمتحكم (اختياري)؛ المسارات المعرّفة بالتعليقات التوضيحية فقط هي القابلة للوصول.
+
+**التركيب الكامل لـ `#[Route]`**: `#[Route(path, methods, name)]`
+- `path`: مسار التوجيه، يبدأ بـ `/`؛ عند `null` يقيّد فقط طرق HTTP للمسار الافتراضي دون تسجيل مسار جديد
+- `methods`: طريقة/طرق HTTP، نص أو مصفوفة نصوص، مثل `'GET'` أو `['GET','POST']`
+- `name`: اسم المسار لـ `route('name')` لتوليد الرابط، يمكن حذفه
 
 ### تعليقات بلا مسار: تقييد طرق HTTP للطرق الافتراضية
 
@@ -147,16 +163,61 @@ class UserController
 
 ### طرق HTTP مخصصة واسم المسار
 
+`#[Route]` يدعم عدة طرق HTTP واسم المسار:
+
 ```php
 use support\annotation\route\Route;
 
 #[Route('/user', ['GET', 'POST'], 'user.form')]
 public function form() { ... }
+
+// المسار والطريقة فقط، بدون اسم المسار
+#[Route('/user/update', 'PUT')]
+public function update() { ... }
 ```
+
+### معلمات المسار والتعبيرات النمطية
+
+مسار التوجيه بالتعليقات يدعم نفس تراكيب المعلمات كـ `config/route.php`، بما في ذلك التعبيرات النمطية والمعلمات الاختيارية:
+
+```php
+#[Get('/user/{id:\d+}')]           // id رقمي فقط
+public function show($id) { ... }
+
+#[Get('/user[/{name}]')]           // name اختياري: /user أو /user/xxx
+public function list($name = null) { ... }
+
+#[Any('/user/[{path:.+}]')]        // يطابق /user و /user/ بأي لاحقة
+public function catchAll($path = null) { ... }
+```
+
+راجع قسم «معاملات المسار» في هذا المستند.
 
 ### البرمجيات الوسيطة
 
-`#[Middleware]` على المتحكم أو الدالة تنطبق على مسارات التعليقات التوضيحية، بنفس استخدام `support\annotation\Middleware`.
+`#[Middleware]` على المتحكم أو الدالة تنطبق على مسارات التعليقات التوضيحية؛ نفس استخدام `support\annotation\Middleware`:
+
+```php
+use support\annotation\Middleware;
+
+#[Middleware(\app\middleware\AuthMiddleware::class)]
+class UserController { ... }
+
+#[Get('/user/{id}')]
+#[Middleware(\app\middleware\RateLimitMiddleware::class)]
+public function show($id) { ... }
+```
+
+### توليد الرابط مع route()
+
+عند تحديد اسم المسار في التعليق، استخدم `route('name', $params)` لتوليد الرابط:
+
+```php
+#[Get('/user/{id}', 'user.show')]
+public function show($id) { ... }
+
+// الاستخدام: route('user.show', ['id' => 123])  =>  /user/123
+```
 
 
 ## معاملات المسار

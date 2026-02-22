@@ -82,9 +82,12 @@ Defina rotas através de anotações nos métodos do controlador, sem necessidad
 
 ```php
 namespace app\controller;
+use support\annotation\route\DisableDefaultRoute;
 use support\annotation\route\Get;
 use support\annotation\route\Post;
+use support\annotation\route\Route;
 
+#[DisableDefaultRoute]
 class UserController
 {
     #[Get('/user/{id}')]
@@ -98,10 +101,23 @@ class UserController
     {
         return 'created';
     }
+
+    #[Route('/user/form', ['GET', 'POST'], 'user.form')]
+    public function form()
+    {
+        return 'form';
+    }
 }
 ```
 
 Anotações disponíveis: `#[Get]` `#[Post]` `#[Put]` `#[Delete]` `#[Patch]` `#[Head]` `#[Options]` `#[Any]` (qualquer método). O caminho deve começar com `/`. O segundo parâmetro pode especificar o nome da rota, usado por `route()` para gerar URL.
+
+`#[DisableDefaultRoute]` desativa o roteamento padrão do controlador (opcional); apenas rotas definidas por anotações são acessíveis.
+
+**Sintaxe completa `#[Route]`**: `#[Route(path, methods, name)]`
+- `path`: caminho da rota, começa com `/`; quando `null` apenas restringe os métodos HTTP da rota padrão sem registrar nova rota
+- `methods`: método(s) HTTP, string ou array de strings, ex. `'GET'` ou `['GET','POST']`
+- `name`: nome da rota para `route('name')` geração de URL, pode ser omitido
 
 ### Anotações sem parâmetros: restringir método HTTP na rota padrão
 
@@ -145,16 +161,61 @@ class UserController
 
 ### Métodos HTTP personalizados e nome da rota
 
+`#[Route]` suporta vários métodos HTTP e o nome da rota:
+
 ```php
 use support\annotation\route\Route;
 
 #[Route('/user', ['GET', 'POST'], 'user.form')]
 public function form() { ... }
+
+// Apenas caminho e método, sem nome da rota
+#[Route('/user/update', 'PUT')]
+public function update() { ... }
 ```
+
+### Parâmetros de caminho e regex
+
+Rotas com anotações suportam a mesma sintaxe de parâmetros que `config/route.php`, incluindo regex e parâmetros opcionais:
+
+```php
+#[Get('/user/{id:\d+}')]           // Apenas id numérico
+public function show($id) { ... }
+
+#[Get('/user[/{name}]')]           // name opcional: /user ou /user/xxx
+public function list($name = null) { ... }
+
+#[Any('/user/[{path:.+}]')]        // Corresponde a /user e /user/ com qualquer sufixo
+public function catchAll($path = null) { ... }
+```
+
+Consulte a seção «Parâmetros de rota» neste documento.
 
 ### Middleware
 
-`#[Middleware]` no controlador ou método afeta as rotas por anotações, uso igual a `support\annotation\Middleware`.
+`#[Middleware]` no controlador ou método afeta as rotas por anotações; uso igual a `support\annotation\Middleware`:
+
+```php
+use support\annotation\Middleware;
+
+#[Middleware(\app\middleware\AuthMiddleware::class)]
+class UserController { ... }
+
+#[Get('/user/{id}')]
+#[Middleware(\app\middleware\RateLimitMiddleware::class)]
+public function show($id) { ... }
+```
+
+### Geração de URL com route()
+
+Quando o nome da rota é especificado na anotação, use `route('name', $params)` para gerar a URL:
+
+```php
+#[Get('/user/{id}', 'user.show')]
+public function show($id) { ... }
+
+// Uso: route('user.show', ['id' => 123])  =>  /user/123
+```
 
 ## Parâmetros de rota
 Se houver parâmetros na rota, use `{chave}` para corresponder, e o resultado da correspondência será passado para os parâmetros do método do controlador (a partir do segundo parâmetro em diante), por exemplo:

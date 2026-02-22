@@ -80,9 +80,12 @@ Route::any('/testclass', [app\controller\IndexController::class, 'test']);
 
 ```php
 namespace app\controller;
+use support\annotation\route\DisableDefaultRoute;
 use support\annotation\route\Get;
 use support\annotation\route\Post;
+use support\annotation\route\Route;
 
+#[DisableDefaultRoute]
 class UserController
 {
     #[Get('/user/{id}')]
@@ -96,10 +99,23 @@ class UserController
     {
         return 'created';
     }
+
+    #[Route('/user/form', ['GET', 'POST'], 'user.form')]
+    public function form()
+    {
+        return 'form';
+    }
 }
 ```
 
 사용 가능한 어노테이션: `#[Get]` `#[Post]` `#[Put]` `#[Delete]` `#[Patch]` `#[Head]` `#[Options]` `#[Any]` (임의 메서드). 경로는 반드시 `/`로 시작해야 합니다. 두 번째 매개변수로 라우트 이름을 지정할 수 있으며 `route()`로 URL 생성 시 사용합니다.
+
+`#[DisableDefaultRoute]`는 해당 컨트롤러의 기본 라우트를 비활성화합니다(선택사항). 어노테이션으로 정의한 라우트만 접근 가능합니다.
+
+**`#[Route]` 전체 구문**: `#[Route(path, methods, name)]`
+- `path`: 라우트 경로, `/`로 시작；`null`일 때는 기본 라우트의 HTTP 메서드만 제한하고 새 라우트는 등록하지 않음
+- `methods`: HTTP 메서드, 문자열 또는 문자열 배열, 예: `'GET'` 또는 `['GET','POST']`
+- `name`: `route('name')`으로 URL 생성 시 사용하는 라우트 이름, 생략 가능
 
 ### 매개변수 없는 어노테이션: 기본 라우트의 HTTP 메서드 제한
 
@@ -143,16 +159,61 @@ class UserController
 
 ### 커스텀 HTTP 메서드와 라우트 이름
 
+`#[Route]`는 다양한 HTTP 메서드와 라우트 이름을 지원합니다:
+
 ```php
 use support\annotation\route\Route;
 
 #[Route('/user', ['GET', 'POST'], 'user.form')]
 public function form() { ... }
+
+// 경로와 메서드만 지정, 라우트 이름 없음
+#[Route('/user/update', 'PUT')]
+public function update() { ... }
 ```
+
+### 경로 매개변수와 정규식
+
+어노테이션 라우트 경로는 `config/route.php`와 동일한 매개변수 문법을 지원하며, 정규식과 선택적 매개변수를 포함합니다:
+
+```php
+#[Get('/user/{id:\d+}')]           // 숫자 id만 매칭
+public function show($id) { ... }
+
+#[Get('/user[/{name}]')]           // name 선택적, /user 또는 /user/xxx
+public function list($name = null) { ... }
+
+#[Any('/user/[{path:.+}]')]        // /user 및 /user/ 임의 접미사 매칭
+public function catchAll($path = null) { ... }
+```
+
+자세한 내용은 본 문서의 「라우팅 매개변수」 섹션을 참조하세요.
 
 ### 미들웨어
 
-컨트롤러 또는 메서드에 `#[Middleware]`를 사용하면 어노테이션 라우트에 적용되며, `support\annotation\Middleware`와 동일하게 사용합니다.
+컨트롤러 또는 메서드의 `#[Middleware]`는 어노테이션 라우트에 적용되며, `support\annotation\Middleware`와 동일하게 사용합니다:
+
+```php
+use support\annotation\Middleware;
+
+#[Middleware(\app\middleware\AuthMiddleware::class)]
+class UserController { ... }
+
+#[Get('/user/{id}')]
+#[Middleware(\app\middleware\RateLimitMiddleware::class)]
+public function show($id) { ... }
+```
+
+### route() URL 생성 연동
+
+어노테이션에서 라우트 이름을 지정한 경우, `route('name', $params)`로 URL을 생성할 수 있습니다:
+
+```php
+#[Get('/user/{id}', 'user.show')]
+public function show($id) { ... }
+
+// 사용: route('user.show', ['id' => 123])  =>  /user/123
+```
 
 ## 라우팅 매개변수
 라우트에 매개변수가 있는 경우, `{key}`로 일치시키고 결과가 해당하는 컨트롤러 메서드 매개변수로 전달됩니다(두 번째 매개변수부터 전달됨), 예를 들어:

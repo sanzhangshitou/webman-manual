@@ -84,9 +84,12 @@ Route::any('/testclass', [app\controller\IndexController::class, 'test']);
 
 ```php
 namespace app\controller;
+use support\annotation\route\DisableDefaultRoute;
 use support\annotation\route\Get;
 use support\annotation\route\Post;
+use support\annotation\route\Route;
 
+#[DisableDefaultRoute]
 class UserController
 {
     #[Get('/user/{id}')]
@@ -100,10 +103,23 @@ class UserController
     {
         return 'created';
     }
+
+    #[Route('/user/form', ['GET', 'POST'], 'user.form')]
+    public function form()
+    {
+        return 'form';
+    }
 }
 ```
 
 उपलब्ध एनोटेशन: `#[Get]` `#[Post]` `#[Put]` `#[Delete]` `#[Patch]` `#[Head]` `#[Options]` `#[Any]` (कोई भी मेथड)। पथ `/` से शुरू होना चाहिए। दूसरा पैरामीटर `route()` URL जनरेशन के लिए रूट नाम निर्दिष्ट कर सकता है।
+
+`#[DisableDefaultRoute]` इस कंट्रोलर के लिए डिफ़ॉल्ट रूटिंग अक्षम करता है (वैकल्पिक); केवल एनोटेशन द्वारा परिभाषित रूट ही पहुंच योग्य हैं।
+
+**`#[Route]` पूर्ण सिंटैक्स**: `#[Route(path, methods, name)]`
+- `path`: रूट पथ, `/` से शुरू; `null` होने पर केवल डिफ़ॉल्ट रूट के HTTP मेथड प्रतिबंधित करता है, नया रूट पंजीकृत नहीं करता
+- `methods`: HTTP मेथड(स), स्ट्रिंग या स्ट्रिंग सरणी, जैसे `'GET'` या `['GET','POST']`
+- `name`: `route('name')` URL जनरेशन के लिए रूट नाम, छोड़ा जा सकता है
 
 ### पैरामीटर रहित एनोटेशन: डिफ़ॉल्ट रूट के HTTP मेथड प्रतिबंधित करना
 
@@ -147,16 +163,61 @@ class UserController
 
 ### कस्टम HTTP मेथड और रूट नाम
 
+`#[Route]` एकाधिक HTTP मेथड और रूट नाम का समर्थन करता है:
+
 ```php
 use support\annotation\route\Route;
 
 #[Route('/user', ['GET', 'POST'], 'user.form')]
 public function form() { ... }
+
+// केवल पथ और मेथड, रूट नाम के बिना
+#[Route('/user/update', 'PUT')]
+public function update() { ... }
 ```
+
+### पथ पैरामीटर और regex
+
+एनोटेशन रूट पथ `config/route.php` के समान पैरामीटर सिंटैक्स समर्थन करते हैं, regex और वैकल्पिक पैरामीटर सहित:
+
+```php
+#[Get('/user/{id:\d+}')]           // केवल संख्यात्मक id
+public function show($id) { ... }
+
+#[Get('/user[/{name}]')]           // name वैकल्पिक: /user या /user/xxx
+public function list($name = null) { ... }
+
+#[Any('/user/[{path:.+}]')]        // /user और /user/ किसी भी प्रत्यय के साथ मेल खाता है
+public function catchAll($path = null) { ... }
+```
+
+इस दस्तावेज़ में「रूटिंग पैरामीटर」अनुभाग देखें।
 
 ### मिडलवेयर
 
-कंट्रोलर या मेथड पर `#[Middleware]` एनोटेशन रूट पर लागू होता है, `support\annotation\Middleware` के समान उपयोग।
+कंट्रोलर या मेथड पर `#[Middleware]` एनोटेशन रूट पर लागू होता है; `support\annotation\Middleware` के समान उपयोग:
+
+```php
+use support\annotation\Middleware;
+
+#[Middleware(\app\middleware\AuthMiddleware::class)]
+class UserController { ... }
+
+#[Get('/user/{id}')]
+#[Middleware(\app\middleware\RateLimitMiddleware::class)]
+public function show($id) { ... }
+```
+
+### route() के साथ URL जनरेशन
+
+जब एनोटेशन में रूट नाम निर्दिष्ट हो, URL जनरेट करने के लिए `route('name', $params)` उपयोग करें:
+
+```php
+#[Get('/user/{id}', 'user.show')]
+public function show($id) { ... }
+
+// उपयोग: route('user.show', ['id' => 123])  =>  /user/123
+```
 
 
 ## रूटिंग पैरामीटर

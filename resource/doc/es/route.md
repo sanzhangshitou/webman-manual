@@ -81,9 +81,12 @@ Defina rutas mediante anotaciones en métodos del controlador, sin necesidad de 
 
 ```php
 namespace app\controller;
+use support\annotation\route\DisableDefaultRoute;
 use support\annotation\route\Get;
 use support\annotation\route\Post;
+use support\annotation\route\Route;
 
+#[DisableDefaultRoute]
 class UserController
 {
     #[Get('/user/{id}')]
@@ -97,10 +100,23 @@ class UserController
     {
         return 'created';
     }
+
+    #[Route('/user/form', ['GET', 'POST'], 'user.form')]
+    public function form()
+    {
+        return 'form';
+    }
 }
 ```
 
 Anotaciones disponibles: `#[Get]` `#[Post]` `#[Put]` `#[Delete]` `#[Patch]` `#[Head]` `#[Options]` `#[Any]` (cualquier método). La ruta debe comenzar con `/`. El segundo parámetro puede especificar el nombre de la ruta, usado por `route()` para generar URL.
+
+`#[DisableDefaultRoute]` desactiva el enrutamiento por defecto del controlador (opcional); solo las rutas definidas por anotaciones son accesibles.
+
+**Sintaxis completa `#[Route]`**: `#[Route(path, methods, name)]`
+- `path`: ruta, comienza con `/`; cuando es `null` solo restringe los métodos HTTP de la ruta por defecto sin registrar nueva ruta
+- `methods`: método(s) HTTP, cadena o array de cadenas, ej. `'GET'` o `['GET','POST']`
+- `name`: nombre de ruta para `route('name')` generación de URL, puede omitirse
 
 ### Anotaciones sin parámetros: restringir método HTTP en ruta predeterminada
 
@@ -144,16 +160,61 @@ class UserController
 
 ### Métodos HTTP personalizados y nombre de ruta
 
+`#[Route]` soporta varios métodos HTTP y el nombre de ruta:
+
 ```php
 use support\annotation\route\Route;
 
 #[Route('/user', ['GET', 'POST'], 'user.form')]
 public function form() { ... }
+
+// Solo ruta y método, sin nombre de ruta
+#[Route('/user/update', 'PUT')]
+public function update() { ... }
 ```
+
+### Parámetros de ruta y regex
+
+Las rutas con anotaciones soportan la misma sintaxis de parámetros que `config/route.php`, incluyendo regex y parámetros opcionales:
+
+```php
+#[Get('/user/{id:\d+}')]           // Solo id numérico
+public function show($id) { ... }
+
+#[Get('/user[/{name}]')]           // name opcional: /user o /user/xxx
+public function list($name = null) { ... }
+
+#[Any('/user/[{path:.+}]')]        // Coincide con /user y /user/ con cualquier sufijo
+public function catchAll($path = null) { ... }
+```
+
+Consulte la sección «Parámetros de enrutamiento» en este documento.
 
 ### Middleware
 
-`#[Middleware]` en controlador o método afecta las rutas por anotaciones, uso igual que `support\annotation\Middleware`.
+`#[Middleware]` en controlador o método afecta las rutas por anotaciones; uso igual que `support\annotation\Middleware`:
+
+```php
+use support\annotation\Middleware;
+
+#[Middleware(\app\middleware\AuthMiddleware::class)]
+class UserController { ... }
+
+#[Get('/user/{id}')]
+#[Middleware(\app\middleware\RateLimitMiddleware::class)]
+public function show($id) { ... }
+```
+
+### Generación de URL con route()
+
+Cuando el nombre de ruta se especifica en la anotación, use `route('name', $params)` para generar la URL:
+
+```php
+#[Get('/user/{id}', 'user.show')]
+public function show($id) { ... }
+
+// Uso: route('user.show', ['id' => 123])  =>  /user/123
+```
 
 ## Parámetros de enrutamiento
 Si hay parámetros en la ruta, se pueden emparejar con `{clave}` y el resultado del emparejamiento se pasará como argumento al método del controlador correspondiente (a partir del segundo argumento), por ejemplo:

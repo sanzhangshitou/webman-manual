@@ -85,9 +85,12 @@ Define routes using annotations on controller methods without configuring in `co
 
 ```php
 namespace app\controller;
+use support\annotation\route\DisableDefaultRoute;
 use support\annotation\route\Get;
 use support\annotation\route\Post;
+use support\annotation\route\Route;
 
+#[DisableDefaultRoute]
 class UserController
 {
     #[Get('/user/{id}')]
@@ -101,10 +104,23 @@ class UserController
     {
         return 'created';
     }
+
+    #[Route('/user/form', ['GET', 'POST'], 'user.form')]
+    public function form()
+    {
+        return 'form';
+    }
 }
 ```
 
-Available annotations: `#[Get]` `#[Post]` `#[Put]` `#[Delete]` `#[Patch]` `#[Head]` `#[Options]` `#[Any]` (any method). Paths must start with `/`. The second parameter can specify a route name for `route()` URL generation.
+Available annotations: `#[Get]` `#[Post]` `#[Put]` `#[Delete]` `#[Patch]` `#[Head]` `#[Options]` `#[Any]` (any method). Paths must start with `/`. The second parameter may specify a route name for URL generation via `route()`.
+
+`#[DisableDefaultRoute]` disables default routing for the controller (optional); only routes defined by annotations are accessible.
+
+**`#[Route]` full syntax**: `#[Route(path, methods, name)]`
+- `path`: Route path, must start with `/`; when `null`, only restricts HTTP methods for the default route without registering a new route
+- `methods`: HTTP method(s), string or array of strings, e.g. `'GET'` or `['GET','POST']`
+- `name`: Route name for `route('name')` URL generation, can be omitted
 
 ### Parameterless Annotations: Restrict HTTP Methods for Default Routes
 
@@ -148,16 +164,61 @@ class UserController
 
 ### Custom HTTP Methods and Route Name
 
+`#[Route]` supports custom HTTP methods and route names:
+
 ```php
 use support\annotation\route\Route;
 
 #[Route('/user', ['GET', 'POST'], 'user.form')]
 public function form() { ... }
+
+// Path and method only, no route name
+#[Route('/user/update', 'PUT')]
+public function update() { ... }
 ```
+
+### Path Parameters and Regex
+
+Annotation route paths support the same parameter syntax as `config/route.php`, including regex and optional parameters:
+
+```php
+#[Get('/user/{id:\d+}')]           // Numeric id only
+public function show($id) { ... }
+
+#[Get('/user[/{name}]')]           // name optional: /user or /user/xxx
+public function list($name = null) { ... }
+
+#[Any('/user/[{path:.+}]')]        // Matches /user and /user/ with any suffix
+public function catchAll($path = null) { ... }
+```
+
+See the "Route Parameters" section in this document for details.
 
 ### Middleware
 
-`#[Middleware]` on a controller or method applies to annotation routes, same usage as `support\annotation\Middleware`.
+`#[Middleware]` on a controller or method applies to annotation routes; usage is the same as `support\annotation\Middleware`:
+
+```php
+use support\annotation\Middleware;
+
+#[Middleware(\app\middleware\AuthMiddleware::class)]
+class UserController { ... }
+
+#[Get('/user/{id}')]
+#[Middleware(\app\middleware\RateLimitMiddleware::class)]
+public function show($id) { ... }
+```
+
+### URL Generation with route()
+
+When a route name is specified in an annotation, use `route('name', $params)` to generate the URL:
+
+```php
+#[Get('/user/{id}', 'user.show')]
+public function show($id) { ... }
+
+// Usage: route('user.show', ['id' => 123])  =>  /user/123
+```
 
 
 ## Route Parameters

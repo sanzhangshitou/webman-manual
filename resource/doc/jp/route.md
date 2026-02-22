@@ -85,9 +85,12 @@ Route::any('/testclass', [app\controller\IndexController::class, 'test']);
 
 ```php
 namespace app\controller;
+use support\annotation\route\DisableDefaultRoute;
 use support\annotation\route\Get;
 use support\annotation\route\Post;
+use support\annotation\route\Route;
 
+#[DisableDefaultRoute]
 class UserController
 {
     #[Get('/user/{id}')]
@@ -101,10 +104,23 @@ class UserController
     {
         return 'created';
     }
+
+    #[Route('/user/form', ['GET', 'POST'], 'user.form')]
+    public function form()
+    {
+        return 'form';
+    }
 }
 ```
 
 使用可能なアノテーション：`#[Get]` `#[Post]` `#[Put]` `#[Delete]` `#[Patch]` `#[Head]` `#[Options]` `#[Any]`（任意のメソッド）。パスは `/` で始める必要があります。第2パラメータでルート名を指定でき、`route()` でURL生成に使用します。
+
+`#[DisableDefaultRoute]` はそのコントローラのデフォルトルートを無効にします（任意）。アノテーションで定義したルートのみアクセス可能になります。
+
+**`#[Route]` 完全構文**：`#[Route(path, methods, name)]`
+- `path`：ルートパス、`/` で始める；`null` の場合はデフォルトルートのHTTPメソッドのみ制限し、新ルートは登録しない
+- `methods`：HTTPメソッド、文字列または文字列配列、例：`'GET'` または `['GET','POST']`
+- `name`：`route('name')` でURL生成に使用するルート名、省略可
 
 ### パスなしアノテーション：デフォルトルートのHTTPメソッド制限
 
@@ -148,16 +164,61 @@ class UserController
 
 ### カスタムHTTPメソッドとルート名
 
+`#[Route]` は複数HTTPメソッドとルート名を指定できます：
+
 ```php
 use support\annotation\route\Route;
 
 #[Route('/user', ['GET', 'POST'], 'user.form')]
 public function form() { ... }
+
+// パスとメソッドのみ、ルート名なし
+#[Route('/user/update', 'PUT')]
+public function update() { ... }
 ```
+
+### パスパラメータと正規表現
+
+アノテーションルートのパスは `config/route.php` と同じパラメータ構文をサポートし、正規表現とオプショナルパラメータを含みます：
+
+```php
+#[Get('/user/{id:\d+}')]           // 数字のidのみ
+public function show($id) { ... }
+
+#[Get('/user[/{name}]')]           // nameはオプション、/user または /user/xxx
+public function list($name = null) { ... }
+
+#[Any('/user/[{path:.+}]')]        // /user および /user/ に任意のサフィックスでマッチ
+public function catchAll($path = null) { ... }
+```
+
+詳細は本文書の「ルーティングパラメータ」の章を参照してください。
 
 ### ミドルウェア
 
-コントローラやメソッドの `#[Middleware]` はアノテーションルートに適用され、`support\annotation\Middleware` と同じ用法です。
+コントローラやメソッドの `#[Middleware]` はアノテーションルートに適用され、`support\annotation\Middleware` と同じ用法です：
+
+```php
+use support\annotation\Middleware;
+
+#[Middleware(\app\middleware\AuthMiddleware::class)]
+class UserController { ... }
+
+#[Get('/user/{id}')]
+#[Middleware(\app\middleware\RateLimitMiddleware::class)]
+public function show($id) { ... }
+```
+
+### route() での URL 生成
+
+アノテーションでルート名を指定した場合、`route('name', $params)` でURLを生成できます：
+
+```php
+#[Get('/user/{id}', 'user.show')]
+public function show($id) { ... }
+
+// 使用例：route('user.show', ['id' => 123])  =>  /user/123
+```
 
 
 ## ルーティングパラメータ

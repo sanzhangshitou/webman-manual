@@ -84,9 +84,12 @@ Denetleyici metotlarındaki notasyonlarla rotaları tanımlayın, `config/route.
 
 ```php
 namespace app\controller;
+use support\annotation\route\DisableDefaultRoute;
 use support\annotation\route\Get;
 use support\annotation\route\Post;
+use support\annotation\route\Route;
 
+#[DisableDefaultRoute]
 class UserController
 {
     #[Get('/user/{id}')]
@@ -100,10 +103,23 @@ class UserController
     {
         return 'created';
     }
+
+    #[Route('/user/form', ['GET', 'POST'], 'user.form')]
+    public function form()
+    {
+        return 'form';
+    }
 }
 ```
 
 Kullanılabilir notasyonlar: `#[Get]` `#[Post]` `#[Put]` `#[Delete]` `#[Patch]` `#[Head]` `#[Options]` `#[Any]` (herhangi bir yöntem). Yol `/` ile başlamalıdır. İkinci parametre rota adını belirtebilir, `route()` ile URL oluşturmak için kullanılır.
+
+`#[DisableDefaultRoute]` bu denetleyici için varsayılan yönlendirmeyi devre dışı bırakır (isteğe bağlı); yalnızca notasyonla tanımlanan rotalar erişilebilir.
+
+**`#[Route]` tam sözdizimi**: `#[Route(path, methods, name)]`
+- `path`: rota yolu, `/` ile başlar; `null` olduğunda yalnızca varsayılan rotanın HTTP yöntemlerini kısıtlar, yeni rota kaydetmez
+- `methods`: HTTP yöntemi(ler), dize veya dize dizisi, örn. `'GET'` veya `['GET','POST']`
+- `name`: `route('name')` URL oluşturma için rota adı, atlanabilir
 
 ### Parametresiz notasyonlar: varsayılan rota HTTP yöntemini kısıtlama
 
@@ -147,16 +163,61 @@ class UserController
 
 ### Özel HTTP yöntemleri ve rota adı
 
+`#[Route]` birden çok HTTP yöntemi ve rota adını destekler:
+
 ```php
 use support\annotation\route\Route;
 
 #[Route('/user', ['GET', 'POST'], 'user.form')]
 public function form() { ... }
+
+// Yalnızca yol ve yöntem, rota adı yok
+#[Route('/user/update', 'PUT')]
+public function update() { ... }
 ```
+
+### Yol parametreleri ve regex
+
+Notasyon rota yolları `config/route.php` ile aynı parametre sözdizimini destekler, regex ve isteğe bağlı parametreler dahil:
+
+```php
+#[Get('/user/{id:\d+}')]           // Yalnızca sayısal id
+public function show($id) { ... }
+
+#[Get('/user[/{name}]')]           // name isteğe bağlı: /user veya /user/xxx
+public function list($name = null) { ... }
+
+#[Any('/user/[{path:.+}]')]        // /user ve /user/ herhangi bir sonekle eşleşir
+public function catchAll($path = null) { ... }
+```
+
+Bu belgedeki「Yönlendirme Parametreleri」bölümüne bakın.
 
 ### Ara katman
 
-Denetleyicide veya metotta `#[Middleware]` notasyon rotalarına uygulanır, `support\annotation\Middleware` ile aynı şekilde kullanılır.
+Denetleyicide veya metotta `#[Middleware]` notasyon rotalarına uygulanır; `support\annotation\Middleware` ile aynı şekilde kullanılır:
+
+```php
+use support\annotation\Middleware;
+
+#[Middleware(\app\middleware\AuthMiddleware::class)]
+class UserController { ... }
+
+#[Get('/user/{id}')]
+#[Middleware(\app\middleware\RateLimitMiddleware::class)]
+public function show($id) { ... }
+```
+
+### route() ile URL oluşturma
+
+Notasyonda rota adı belirtildiğinde, URL oluşturmak için `route('name', $params)` kullanın:
+
+```php
+#[Get('/user/{id}', 'user.show')]
+public function show($id) { ... }
+
+// Kullanım: route('user.show', ['id' => 123])  =>  /user/123
+```
 
 ## Yönlendirme Parametreleri
 Eğer yönlendirme içinde parametre varsa, eşleşen sonuçlar ilgili kontrolcü metodlarına parametre olarak iletilir (ikinci parametreden başlayarak sırayla iletilir), örneğin:

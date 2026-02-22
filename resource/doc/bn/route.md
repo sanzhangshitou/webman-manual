@@ -83,9 +83,12 @@ Route::any('/testclass', [app\controller\IndexController::class, 'test']);
 
 ```php
 namespace app\controller;
+use support\annotation\route\DisableDefaultRoute;
 use support\annotation\route\Get;
 use support\annotation\route\Post;
+use support\annotation\route\Route;
 
+#[DisableDefaultRoute]
 class UserController
 {
     #[Get('/user/{id}')]
@@ -99,10 +102,23 @@ class UserController
     {
         return 'created';
     }
+
+    #[Route('/user/form', ['GET', 'POST'], 'user.form')]
+    public function form()
+    {
+        return 'form';
+    }
 }
 ```
 
 উপলব্ধ অ্যানোটেশন: `#[Get]` `#[Post]` `#[Put]` `#[Delete]` `#[Patch]` `#[Head]` `#[Options]` `#[Any]` (যেকোনো পদ্ধতি)। পাথগুলি `/` দিয়ে শুরু করতে হবে। দ্বিতীয় প্যারামিটার `route()` URL জেনারেশনের জন্য রুট নাম নির্দিষ্ট করতে পারে।
+
+`#[DisableDefaultRoute]` এই কন্ট্রোলারের ডিফল্ট রুটিং নিষ্ক্রিয় করে (ঐচ্ছিক); শুধুমাত্র অ্যানোটেশন দ্বারা সংজ্ঞায়িত রুটগুলি অ্যাক্সেসযোগ্য।
+
+**`#[Route]` সম্পূর্ণ সিনট্যাক্স**: `#[Route(path, methods, name)]`
+- `path`: রুট পাথ, `/` দিয়ে শুরু; `null` হলে শুধুমাত্র ডিফল্ট রুটের HTTP মেথড সীমাবদ্ধ করে, নতুন রুট নিবন্ধন করে না
+- `methods`: HTTP মেথড(গুলি), স্ট্রিং বা স্ট্রিং অ্যারে, যেমন `'GET'` বা `['GET','POST']`
+- `name`: `route('name')` URL জেনারেশনের জন্য রুট নাম, বাদ দেওয়া যেতে পারে
 
 ### প্যারামিটারবিহীন অ্যানোটেশন: ডিফল্ট রুটের HTTP মেথড সীমাবদ্ধতা
 
@@ -146,16 +162,61 @@ class UserController
 
 ### কাস্টম HTTP মেথড এবং রুট নাম
 
+`#[Route]` একাধিক HTTP মেথড এবং রুট নাম সমর্থন করে:
+
 ```php
 use support\annotation\route\Route;
 
 #[Route('/user', ['GET', 'POST'], 'user.form')]
 public function form() { ... }
+
+// শুধুমাত্র পাথ এবং মেথড, রুট নাম ছাড়া
+#[Route('/user/update', 'PUT')]
+public function update() { ... }
 ```
+
+### পাথ প্যারামিটার এবং regex
+
+অ্যানোটেশন রুট পাথগুলি `config/route.php` এর মতো একই প্যারামিটার সিনট্যাক্স সমর্থন করে, regex এবং ঐচ্ছিক প্যারামিটার সহ:
+
+```php
+#[Get('/user/{id:\d+}')]           // শুধুমাত্র সংখ্যাসূচক id
+public function show($id) { ... }
+
+#[Get('/user[/{name}]')]           // name ঐচ্ছিক: /user বা /user/xxx
+public function list($name = null) { ... }
+
+#[Any('/user/[{path:.+}]')]        // /user এবং /user/ যেকোনো প্রত্যয়ের সাথে মেলে
+public function catchAll($path = null) { ... }
+```
+
+এই নথির「রুট প্যারামিটার」অধ্যায় দেখুন।
 
 ### মিডলওয়্যার
 
-কন্ট্রোলার বা মেথডে `#[Middleware]` অ্যানোটেশন রুটে প্রযোজ্য, `support\annotation\Middleware` এর মতোই ব্যবহার করুন।
+কন্ট্রোলার বা মেথডে `#[Middleware]` অ্যানোটেশন রুটে প্রযোজ্য; `support\annotation\Middleware` এর মতোই ব্যবহার করুন:
+
+```php
+use support\annotation\Middleware;
+
+#[Middleware(\app\middleware\AuthMiddleware::class)]
+class UserController { ... }
+
+#[Get('/user/{id}')]
+#[Middleware(\app\middleware\RateLimitMiddleware::class)]
+public function show($id) { ... }
+```
+
+### route() দিয়ে URL জেনারেশন
+
+অ্যানোটেশনে রুট নাম নির্দিষ্ট হলে, URL জেনারেট করতে `route('name', $params)` ব্যবহার করুন:
+
+```php
+#[Get('/user/{id}', 'user.show')]
+public function show($id) { ... }
+
+// ব্যবহার: route('user.show', ['id' => 123])  =>  /user/123
+```
 
 
 ## রুট প্যারামিটার
