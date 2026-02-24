@@ -368,7 +368,7 @@ override(\Webman\Container::get(0), map([
     '' => '@',
 ]));
 ```
-新建成功后重启`PhpStorm`，在任意代码输入`\support\Container::get(\app\controller\UserController::class)->`提示对应的方法即为成功。
+新建成功后重启`PhpStorm`，在任意方法中输入`\support\Container::get(\app\controller\UserController::class)->`提示对应的方法即为成功。
 
 ## 更多内容
 请参考[php-di手册](https://php-di.org/doc/getting-started.html)
