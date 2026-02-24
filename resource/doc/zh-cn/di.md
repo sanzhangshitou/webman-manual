@@ -354,7 +354,7 @@ class userController
 }
 ```
 
-## PhpStorm类型提示
+## 增强PhpStorm类型提示
 在项目根目录新建文件`.phpstorm.meta.php`
 ```php
 <?php
