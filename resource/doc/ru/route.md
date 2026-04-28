@@ -109,16 +109,11 @@ class UserController
 }
 ```
 
-Доступные аннотации: `#[Get]` `#[Post]` `#[Put]` `#[Delete]` `#[Patch]` `#[Head]` `#[Options]` `#[Any]` (любой метод). Путь должен начинаться с `/`. Второй параметр может указывать имя маршрута для `route()` при генерации URL.
+Доступные аннотации: `#[Get]` `#[Post]` `#[Put]` `#[Delete]` `#[Patch]` `#[Head]` `#[Options]` `#[Any]` (любой метод).
 
 `#[DisableDefaultRoute]` отключает маршрутизацию по умолчанию для контроллера (необязательно); доступны только маршруты, определённые аннотациями.
 
-**Полный синтаксис `#[Route]`**: `#[Route(path, methods, name)]`
-- `path`: путь маршрута, начинается с `/`; при `null` только ограничивает HTTP-методы маршрута по умолчанию без регистрации нового маршрута
-- `methods`: HTTP-метод(ы), строка или массив строк, напр. `'GET'` или `['GET','POST']`
-- `name`: имя маршрута для `route('name')` при генерации URL, можно опустить
-
-### Аннотации без параметров: ограничение HTTP-метода маршрута по умолчанию
+### Аннотации без пути: ограничение HTTP-методов маршрута по умолчанию
 
 Без пути ограничивает только разрешённые HTTP-методы для данного действия, при этом используется путь маршрута по умолчанию:
 
@@ -192,22 +187,24 @@ public function catchAll($path = null) { ... }
 
 ### Промежуточное ПО
 
-`#[Middleware]` в контроллере или методе применяется к маршрутам с аннотациями; использование как у `support\annotation\Middleware`:
+`#[Middleware]` задаёт middleware на контроллере или методе; можно указать несколько классов сразу.
 
 ```php
 use support\annotation\Middleware;
+use app\middleware\AuthMiddleware;
+use app\middleware\RateLimitMiddleware;
 
-#[Middleware(\app\middleware\AuthMiddleware::class)]
+#[Middleware(AuthMiddleware::class)]
 class UserController { ... }
 
 #[Get('/user/{id}')]
-#[Middleware(\app\middleware\RateLimitMiddleware::class)]
+#[Middleware(AuthMiddleware::class, RateLimitMiddleware::class)]
 public function show($id) { ... }
 ```
 
-### Генерация URL с route()
+### Генерация URL
 
-При указании имени маршрута в аннотации используйте `route('name', $params)` для генерации URL:
+После указания имени маршрута в аннотации формируйте URL через `route('name', $params)`:
 
 ```php
 #[Get('/user/{id}', 'user.show')]

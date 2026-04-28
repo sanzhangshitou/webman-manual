@@ -112,16 +112,11 @@ class UserController
 }
 ```
 
-Annotations disponibles : `#[Get]` `#[Post]` `#[Put]` `#[Delete]` `#[Patch]` `#[Head]` `#[Options]` `#[Any]` (toute méthode). Les chemins doivent commencer par `/`. Le deuxième paramètre peut spécifier un nom de route pour la génération d'URL avec `route()`.
+Annotations disponibles : `#[Get]` `#[Post]` `#[Put]` `#[Delete]` `#[Patch]` `#[Head]` `#[Options]` `#[Any]` (toute méthode).
 
 `#[DisableDefaultRoute]` désactive le routage par défaut du contrôleur (optionnel) ; seules les routes définies par annotation sont accessibles.
 
-**Syntaxe complète `#[Route]`** : `#[Route(path, methods, name)]`
-- `path` : chemin de route, commence par `/` ; `null` pour ne restreindre que les méthodes HTTP de la route par défaut sans enregistrer de nouvelle route
-- `methods` : méthode(s) HTTP, chaîne ou tableau de chaînes, ex. `'GET'` ou `['GET','POST']`
-- `name` : nom de route pour `route('name')` génération d'URL, peut être omis
-
-### Annotations sans chemin : restreindre les méthodes HTTP pour les routes par défaut
+### Annotations sans chemin : restreindre les méthodes HTTP de la route par défaut
 
 Sans chemin spécifié, seules les méthodes HTTP autorisées pour cette action sont restreintes ; le chemin de route par défaut reste utilisé :
 
@@ -195,22 +190,24 @@ Voir le chapitre « Paramètres de routage » dans ce document pour plus de dét
 
 ### Middleware
 
-`#[Middleware]` sur un contrôleur ou une méthode s'applique aux routes d'annotation ; même utilisation que `support\annotation\Middleware` :
+`#[Middleware]` permet de définir des middlewares sur un contrôleur ou une méthode ; plusieurs classes peuvent être déclarées en une fois.
 
 ```php
 use support\annotation\Middleware;
+use app\middleware\AuthMiddleware;
+use app\middleware\RateLimitMiddleware;
 
-#[Middleware(\app\middleware\AuthMiddleware::class)]
+#[Middleware(AuthMiddleware::class)]
 class UserController { ... }
 
 #[Get('/user/{id}')]
-#[Middleware(\app\middleware\RateLimitMiddleware::class)]
+#[Middleware(AuthMiddleware::class, RateLimitMiddleware::class)]
 public function show($id) { ... }
 ```
 
-### Génération d'URL avec route()
+### Génération d'URL
 
-Lorsqu'un nom de route est spécifié dans une annotation, utilisez `route('name', $params)` pour générer l'URL :
+Après avoir défini un nom de route dans l'annotation, générez l'URL avec `route('name', $params)` :
 
 ```php
 #[Get('/user/{id}', 'user.show')]

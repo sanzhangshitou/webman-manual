@@ -112,16 +112,11 @@ class UserController
 }
 ```
 
-उपलब्ध एनोटेशन: `#[Get]` `#[Post]` `#[Put]` `#[Delete]` `#[Patch]` `#[Head]` `#[Options]` `#[Any]` (कोई भी मेथड)। पथ `/` से शुरू होना चाहिए। दूसरा पैरामीटर `route()` URL जनरेशन के लिए रूट नाम निर्दिष्ट कर सकता है।
+उपलब्ध एनोटेशन: `#[Get]` `#[Post]` `#[Put]` `#[Delete]` `#[Patch]` `#[Head]` `#[Options]` `#[Any]` (कोई भी मेथड)।
 
 `#[DisableDefaultRoute]` इस कंट्रोलर के लिए डिफ़ॉल्ट रूटिंग अक्षम करता है (वैकल्पिक); केवल एनोटेशन द्वारा परिभाषित रूट ही पहुंच योग्य हैं।
 
-**`#[Route]` पूर्ण सिंटैक्स**: `#[Route(path, methods, name)]`
-- `path`: रूट पथ, `/` से शुरू; `null` होने पर केवल डिफ़ॉल्ट रूट के HTTP मेथड प्रतिबंधित करता है, नया रूट पंजीकृत नहीं करता
-- `methods`: HTTP मेथड(स), स्ट्रिंग या स्ट्रिंग सरणी, जैसे `'GET'` या `['GET','POST']`
-- `name`: `route('name')` URL जनरेशन के लिए रूट नाम, छोड़ा जा सकता है
-
-### पैरामीटर रहित एनोटेशन: डिफ़ॉल्ट रूट के HTTP मेथड प्रतिबंधित करना
+### पथरहित एनोटेशन: डिफ़ॉल्ट रूट के HTTP मेथड सीमित करना
 
 जब पथ निर्दिष्ट नहीं होता, तो केवल उस एक्शन के लिए अनुमत HTTP मेथड प्रतिबंधित होते हैं; डिफ़ॉल्ट रूट पथ उपयोग होता रहता है:
 
@@ -195,22 +190,24 @@ public function catchAll($path = null) { ... }
 
 ### मिडलवेयर
 
-कंट्रोलर या मेथड पर `#[Middleware]` एनोटेशन रूट पर लागू होता है; `support\annotation\Middleware` के समान उपयोग:
+`#[Middleware]` कंट्रोलर या मेथड पर मिडलवेयर परिभाषित करता है; एक साथ कई क्लास घोषित की जा सकती हैं।
 
 ```php
 use support\annotation\Middleware;
+use app\middleware\AuthMiddleware;
+use app\middleware\RateLimitMiddleware;
 
-#[Middleware(\app\middleware\AuthMiddleware::class)]
+#[Middleware(AuthMiddleware::class)]
 class UserController { ... }
 
 #[Get('/user/{id}')]
-#[Middleware(\app\middleware\RateLimitMiddleware::class)]
+#[Middleware(AuthMiddleware::class, RateLimitMiddleware::class)]
 public function show($id) { ... }
 ```
 
-### route() के साथ URL जनरेशन
+### URL जनरेशन
 
-जब एनोटेशन में रूट नाम निर्दिष्ट हो, URL जनरेट करने के लिए `route('name', $params)` उपयोग करें:
+एनोटेशन में रूट नाम देने के बाद `route('name', $params)` से URL बनाएँ:
 
 ```php
 #[Get('/user/{id}', 'user.show')]

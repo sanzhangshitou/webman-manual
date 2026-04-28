@@ -111,16 +111,11 @@ class UserController
 }
 ```
 
-উপলব্ধ অ্যানোটেশন: `#[Get]` `#[Post]` `#[Put]` `#[Delete]` `#[Patch]` `#[Head]` `#[Options]` `#[Any]` (যেকোনো পদ্ধতি)। পাথগুলি `/` দিয়ে শুরু করতে হবে। দ্বিতীয় প্যারামিটার `route()` URL জেনারেশনের জন্য রুট নাম নির্দিষ্ট করতে পারে।
+উপলব্ধ অ্যানোটেশন: `#[Get]` `#[Post]` `#[Put]` `#[Delete]` `#[Patch]` `#[Head]` `#[Options]` `#[Any]` (যেকোনো পদ্ধতি)।
 
 `#[DisableDefaultRoute]` এই কন্ট্রোলারের ডিফল্ট রুটিং নিষ্ক্রিয় করে (ঐচ্ছিক); শুধুমাত্র অ্যানোটেশন দ্বারা সংজ্ঞায়িত রুটগুলি অ্যাক্সেসযোগ্য।
 
-**`#[Route]` সম্পূর্ণ সিনট্যাক্স**: `#[Route(path, methods, name)]`
-- `path`: রুট পাথ, `/` দিয়ে শুরু; `null` হলে শুধুমাত্র ডিফল্ট রুটের HTTP মেথড সীমাবদ্ধ করে, নতুন রুট নিবন্ধন করে না
-- `methods`: HTTP মেথড(গুলি), স্ট্রিং বা স্ট্রিং অ্যারে, যেমন `'GET'` বা `['GET','POST']`
-- `name`: `route('name')` URL জেনারেশনের জন্য রুট নাম, বাদ দেওয়া যেতে পারে
-
-### প্যারামিটারবিহীন অ্যানোটেশন: ডিফল্ট রুটের HTTP মেথড সীমাবদ্ধতা
+### পথবিহীন অ্যানোটেশন: ডিফল্ট রুটের HTTP মেথড সীমাবদ্ধতা
 
 পাথ নির্দিষ্ট না করলে, শুধুমাত্র সেই অ্যাকশনের জন্য অনুমোদিত HTTP মেথড সীমাবদ্ধ করা হয়; ডিফল্ট রুট পাথ ব্যবহার করা হয়:
 
@@ -194,22 +189,24 @@ public function catchAll($path = null) { ... }
 
 ### মিডলওয়্যার
 
-কন্ট্রোলার বা মেথডে `#[Middleware]` অ্যানোটেশন রুটে প্রযোজ্য; `support\annotation\Middleware` এর মতোই ব্যবহার করুন:
+`#[Middleware]` কন্ট্রোলার বা মেথডে মিডলওয়্যার সংজ্ঞায়িত করে; একসাথে একাধিক ক্লাস ঘোষণা করা যায়।
 
 ```php
 use support\annotation\Middleware;
+use app\middleware\AuthMiddleware;
+use app\middleware\RateLimitMiddleware;
 
-#[Middleware(\app\middleware\AuthMiddleware::class)]
+#[Middleware(AuthMiddleware::class)]
 class UserController { ... }
 
 #[Get('/user/{id}')]
-#[Middleware(\app\middleware\RateLimitMiddleware::class)]
+#[Middleware(AuthMiddleware::class, RateLimitMiddleware::class)]
 public function show($id) { ... }
 ```
 
-### route() দিয়ে URL জেনারেশন
+### URL জেনারেশন
 
-অ্যানোটেশনে রুট নাম নির্দিষ্ট হলে, URL জেনারেট করতে `route('name', $params)` ব্যবহার করুন:
+অ্যানোটেশনে রুট নাম দেওয়ার পর `route('name', $params)` দিয়ে URL তৈরি করুন:
 
 ```php
 #[Get('/user/{id}', 'user.show')]

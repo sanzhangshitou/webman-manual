@@ -113,16 +113,11 @@ class UserController
 }
 ```
 
-Available annotations: `#[Get]` `#[Post]` `#[Put]` `#[Delete]` `#[Patch]` `#[Head]` `#[Options]` `#[Any]` (any method). Paths must start with `/`. The second parameter may specify a route name for URL generation via `route()`.
+Available annotations: `#[Get]` `#[Post]` `#[Put]` `#[Delete]` `#[Patch]` `#[Head]` `#[Options]` `#[Any]` (any method).
 
 `#[DisableDefaultRoute]` disables default routing for the controller (optional); only routes defined by annotations are accessible.
 
-**`#[Route]` full syntax**: `#[Route(path, methods, name)]`
-- `path`: Route path, must start with `/`; when `null`, only restricts HTTP methods for the default route without registering a new route
-- `methods`: HTTP method(s), string or array of strings, e.g. `'GET'` or `['GET','POST']`
-- `name`: Route name for `route('name')` URL generation, can be omitted
-
-### Parameterless Annotations: Restrict HTTP Methods for Default Routes
+### Parameterless annotations: restrict HTTP methods for the default route
 
 When no path is specified, only the allowed HTTP methods for that action are restricted; the default route path is still used:
 
@@ -196,22 +191,24 @@ See the "Route Parameters" section in this document for details.
 
 ### Middleware
 
-`#[Middleware]` on a controller or method applies to annotation routes; usage is the same as `support\annotation\Middleware`:
+`#[Middleware]` can define middleware on a controller or method; multiple middleware classes can be declared at once.
 
 ```php
 use support\annotation\Middleware;
+use app\middleware\AuthMiddleware;
+use app\middleware\RateLimitMiddleware;
 
-#[Middleware(\app\middleware\AuthMiddleware::class)]
+#[Middleware(AuthMiddleware::class)]
 class UserController { ... }
 
 #[Get('/user/{id}')]
-#[Middleware(\app\middleware\RateLimitMiddleware::class)]
+#[Middleware(AuthMiddleware::class, RateLimitMiddleware::class)]
 public function show($id) { ... }
 ```
 
-### URL Generation with route()
+### URL generation
 
-When a route name is specified in an annotation, use `route('name', $params)` to generate the URL:
+After assigning a route name in an annotation, generate the URL with `route('name', $params)`:
 
 ```php
 #[Get('/user/{id}', 'user.show')]

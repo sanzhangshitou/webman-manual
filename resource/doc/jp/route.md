@@ -81,7 +81,7 @@ Route::any('/testclass', [app\controller\IndexController::class, 'test']);
 > **注意**
 > この機能には webman-framework >= v2.2.0 が必要です
 
-### 基本用法
+### 基本的な使い方
 
 ```php
 namespace app\controller;
@@ -113,16 +113,11 @@ class UserController
 }
 ```
 
-使用可能なアノテーション：`#[Get]` `#[Post]` `#[Put]` `#[Delete]` `#[Patch]` `#[Head]` `#[Options]` `#[Any]`（任意のメソッド）。パスは `/` で始める必要があります。第2パラメータでルート名を指定でき、`route()` でURL生成に使用します。
+使用可能なアノテーション：`#[Get]` `#[Post]` `#[Put]` `#[Delete]` `#[Patch]` `#[Head]` `#[Options]` `#[Any]`（任意のメソッド）。
 
 `#[DisableDefaultRoute]` はそのコントローラのデフォルトルートを無効にします（任意）。アノテーションで定義したルートのみアクセス可能になります。
 
-**`#[Route]` 完全構文**：`#[Route(path, methods, name)]`
-- `path`：ルートパス、`/` で始める；`null` の場合はデフォルトルートのHTTPメソッドのみ制限し、新ルートは登録しない
-- `methods`：HTTPメソッド、文字列または文字列配列、例：`'GET'` または `['GET','POST']`
-- `name`：`route('name')` でURL生成に使用するルート名、省略可
-
-### パスなしアノテーション：デフォルトルートのHTTPメソッド制限
+### パスなしアノテーション：デフォルトルートの HTTP メソッド制限
 
 パスを指定しない場合、そのアクションで許可するHTTPメソッドのみを制限し、デフォルトルートパスはそのまま使用されます：
 
@@ -196,22 +191,24 @@ public function catchAll($path = null) { ... }
 
 ### ミドルウェア
 
-コントローラやメソッドの `#[Middleware]` はアノテーションルートに適用され、`support\annotation\Middleware` と同じ用法です：
+`#[Middleware]` はコントローラまたはメソッドでミドルウェアを定義でき、複数クラスを一度に指定できます。
 
 ```php
 use support\annotation\Middleware;
+use app\middleware\AuthMiddleware;
+use app\middleware\RateLimitMiddleware;
 
-#[Middleware(\app\middleware\AuthMiddleware::class)]
+#[Middleware(AuthMiddleware::class)]
 class UserController { ... }
 
 #[Get('/user/{id}')]
-#[Middleware(\app\middleware\RateLimitMiddleware::class)]
+#[Middleware(AuthMiddleware::class, RateLimitMiddleware::class)]
 public function show($id) { ... }
 ```
 
-### route() での URL 生成
+### URL の生成
 
-アノテーションでルート名を指定した場合、`route('name', $params)` でURLを生成できます：
+アノテーションでルート名を指定した場合、`route('name', $params)` で URL を生成できます：
 
 ```php
 #[Get('/user/{id}', 'user.show')]

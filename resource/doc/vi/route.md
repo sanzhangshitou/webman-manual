@@ -112,16 +112,11 @@ class UserController
 }
 ```
 
-Chú thích khả dụng: `#[Get]` `#[Post]` `#[Put]` `#[Delete]` `#[Patch]` `#[Head]` `#[Options]` `#[Any]` (bất kỳ phương thức nào). Đường dẫn phải bắt đầu bằng `/`. Tham số thứ hai có thể chỉ định tên route, dùng cho `route()` khi tạo URL.
+Chú thích khả dụng: `#[Get]` `#[Post]` `#[Put]` `#[Delete]` `#[Patch]` `#[Head]` `#[Options]` `#[Any]` (bất kỳ phương thức nào).
 
 `#[DisableDefaultRoute]` tắt định tuyến mặc định của controller (tùy chọn); chỉ các route định nghĩa bằng chú thích mới truy cập được.
 
-**Cú pháp đầy đủ `#[Route]`**: `#[Route(path, methods, name)]`
-- `path`: đường dẫn route, bắt đầu bằng `/`; khi `null` chỉ giới hạn phương thức HTTP của route mặc định mà không đăng ký route mới
-- `methods`: phương thức HTTP, chuỗi hoặc mảng chuỗi, vd. `'GET'` hoặc `['GET','POST']`
-- `name`: tên route cho `route('name')` tạo URL, có thể bỏ qua
-
-### Chú thích không tham số: giới hạn phương thức HTTP của route mặc định
+### Chú thích không có đường dẫn: giới hạn phương thức HTTP của route mặc định
 
 Không có đường dẫn thì chỉ giới hạn phương thức HTTP được phép cho hành động đó, vẫn dùng đường dẫn route mặc định:
 
@@ -195,22 +190,24 @@ Xem mục 「Tham số của định tuyến」 trong tài liệu này.
 
 ### Middleware
 
-`#[Middleware]` trên controller hoặc method áp dụng cho route chú thích; cách dùng giống `support\annotation\Middleware`:
+`#[Middleware]` định nghĩa middleware trên controller hoặc phương thức; có thể khai báo nhiều lớp cùng lúc.
 
 ```php
 use support\annotation\Middleware;
+use app\middleware\AuthMiddleware;
+use app\middleware\RateLimitMiddleware;
 
-#[Middleware(\app\middleware\AuthMiddleware::class)]
+#[Middleware(AuthMiddleware::class)]
 class UserController { ... }
 
 #[Get('/user/{id}')]
-#[Middleware(\app\middleware\RateLimitMiddleware::class)]
+#[Middleware(AuthMiddleware::class, RateLimitMiddleware::class)]
 public function show($id) { ... }
 ```
 
-### Tạo URL với route()
+### Tạo URL
 
-Khi tên route được chỉ định trong chú thích, dùng `route('name', $params)` để tạo URL:
+Sau khi đặt tên route trong chú thích, tạo URL bằng `route('name', $params)`:
 
 ```php
 #[Get('/user/{id}', 'user.show')]

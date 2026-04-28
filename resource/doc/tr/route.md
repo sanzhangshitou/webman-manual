@@ -112,16 +112,11 @@ class UserController
 }
 ```
 
-Kullanılabilir notasyonlar: `#[Get]` `#[Post]` `#[Put]` `#[Delete]` `#[Patch]` `#[Head]` `#[Options]` `#[Any]` (herhangi bir yöntem). Yol `/` ile başlamalıdır. İkinci parametre rota adını belirtebilir, `route()` ile URL oluşturmak için kullanılır.
+Kullanılabilir notasyonlar: `#[Get]` `#[Post]` `#[Put]` `#[Delete]` `#[Patch]` `#[Head]` `#[Options]` `#[Any]` (herhangi bir yöntem).
 
 `#[DisableDefaultRoute]` bu denetleyici için varsayılan yönlendirmeyi devre dışı bırakır (isteğe bağlı); yalnızca notasyonla tanımlanan rotalar erişilebilir.
 
-**`#[Route]` tam sözdizimi**: `#[Route(path, methods, name)]`
-- `path`: rota yolu, `/` ile başlar; `null` olduğunda yalnızca varsayılan rotanın HTTP yöntemlerini kısıtlar, yeni rota kaydetmez
-- `methods`: HTTP yöntemi(ler), dize veya dize dizisi, örn. `'GET'` veya `['GET','POST']`
-- `name`: `route('name')` URL oluşturma için rota adı, atlanabilir
-
-### Parametresiz notasyonlar: varsayılan rota HTTP yöntemini kısıtlama
+### Yolsuz notasyonlar: varsayılan rotanın HTTP yöntemlerini kısıtlama
 
 Yol olmadan yalnızca bu eyleme izin verilen HTTP yöntemlerini kısıtlar, varsayılan rota yolunu kullanmaya devam eder:
 
@@ -195,22 +190,24 @@ Bu belgedeki「Yönlendirme Parametreleri」bölümüne bakın.
 
 ### Ara katman
 
-Denetleyicide veya metotta `#[Middleware]` notasyon rotalarına uygulanır; `support\annotation\Middleware` ile aynı şekilde kullanılır:
+`#[Middleware]` denetleyici veya metotta ara katman tanımlar; birden fazla sınıf aynı anda bildirilebilir.
 
 ```php
 use support\annotation\Middleware;
+use app\middleware\AuthMiddleware;
+use app\middleware\RateLimitMiddleware;
 
-#[Middleware(\app\middleware\AuthMiddleware::class)]
+#[Middleware(AuthMiddleware::class)]
 class UserController { ... }
 
 #[Get('/user/{id}')]
-#[Middleware(\app\middleware\RateLimitMiddleware::class)]
+#[Middleware(AuthMiddleware::class, RateLimitMiddleware::class)]
 public function show($id) { ... }
 ```
 
-### route() ile URL oluşturma
+### URL oluşturma
 
-Notasyonda rota adı belirtildiğinde, URL oluşturmak için `route('name', $params)` kullanın:
+Notasyonda rota adı verdikten sonra URL’yi `route('name', $params)` ile oluşturun:
 
 ```php
 #[Get('/user/{id}', 'user.show')]

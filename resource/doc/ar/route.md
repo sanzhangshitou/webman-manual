@@ -112,16 +112,11 @@ class UserController
 }
 ```
 
-التعليقات التوضيحية المتاحة: `#[Get]` `#[Post]` `#[Put]` `#[Delete]` `#[Patch]` `#[Head]` `#[Options]` `#[Any]` (أي طريقة). يجب أن تبدأ المسارات بـ `/`. يمكن للبارامتر الثاني تحديد اسم المسار لاستخدامه في `route()` لتوليد الرابط.
+التعليقات التوضيحية المتاحة: `#[Get]` `#[Post]` `#[Put]` `#[Delete]` `#[Patch]` `#[Head]` `#[Options]` `#[Any]` (أي طريقة).
 
 `#[DisableDefaultRoute]` يعطّل التوجيه الافتراضي للمتحكم (اختياري)؛ المسارات المعرّفة بالتعليقات التوضيحية فقط هي القابلة للوصول.
 
-**التركيب الكامل لـ `#[Route]`**: `#[Route(path, methods, name)]`
-- `path`: مسار التوجيه، يبدأ بـ `/`؛ عند `null` يقيّد فقط طرق HTTP للمسار الافتراضي دون تسجيل مسار جديد
-- `methods`: طريقة/طرق HTTP، نص أو مصفوفة نصوص، مثل `'GET'` أو `['GET','POST']`
-- `name`: اسم المسار لـ `route('name')` لتوليد الرابط، يمكن حذفه
-
-### تعليقات بلا مسار: تقييد طرق HTTP للطرق الافتراضية
+### تعليقات بلا مسار: تقييد طرق HTTP للمسار الافتراضي
 
 عند عدم تحديد مسار، يتم فقط تقييد طرق HTTP المسموحة لهذا الإجراء؛ يبقى مسار التوجيه الافتراضي قيد الاستخدام:
 
@@ -195,22 +190,24 @@ public function catchAll($path = null) { ... }
 
 ### البرمجيات الوسيطة
 
-`#[Middleware]` على المتحكم أو الدالة تنطبق على مسارات التعليقات التوضيحية؛ نفس استخدام `support\annotation\Middleware`:
+`#[Middleware]` يعرّف وسيطًا على المتحكم أو الدالة؛ يمكن الإعلان عن عدة فئات دفعة واحدة.
 
 ```php
 use support\annotation\Middleware;
+use app\middleware\AuthMiddleware;
+use app\middleware\RateLimitMiddleware;
 
-#[Middleware(\app\middleware\AuthMiddleware::class)]
+#[Middleware(AuthMiddleware::class)]
 class UserController { ... }
 
 #[Get('/user/{id}')]
-#[Middleware(\app\middleware\RateLimitMiddleware::class)]
+#[Middleware(AuthMiddleware::class, RateLimitMiddleware::class)]
 public function show($id) { ... }
 ```
 
-### توليد الرابط مع route()
+### توليد الرابط
 
-عند تحديد اسم المسار في التعليق، استخدم `route('name', $params)` لتوليد الرابط:
+بعد تعيين اسم المسار في التعليق، ولّد الرابط باستخدام `route('name', $params)`:
 
 ```php
 #[Get('/user/{id}', 'user.show')]

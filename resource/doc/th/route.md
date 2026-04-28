@@ -125,16 +125,11 @@ class UserController
 }
 ```
 
-แอนโนเทชันที่ใช้ได้: `#[Get]` `#[Post]` `#[Put]` `#[Delete]` `#[Patch]` `#[Head]` `#[Options]` `#[Any]` (วิธีใดก็ได้) เส้นทางต้องขึ้นต้นด้วย `/` พารามิเตอร์ที่สองสามารถระบุชื่อเส้นทาง สำหรับ `route()` สร้าง URL
+แอนโนเทชันที่ใช้ได้: `#[Get]` `#[Post]` `#[Put]` `#[Delete]` `#[Patch]` `#[Head]` `#[Options]` `#[Any]` (วิธีใดก็ได้)
 
 `#[DisableDefaultRoute]` หมายถึงปิดเส้นทางเริ่มต้นของ controller นี้ (เลือกได้) เข้าถึงได้เฉพาะเส้นทางที่กำหนดโดยแอนโนเทชันเท่านั้น
 
-**ไวยากรณ์เต็ม `#[Route]`**: `#[Route(path, methods, name)]`
-- `path`: เส้นทาง ขึ้นต้นด้วย `/` เมื่อเป็น `null` จะจำกัดเฉพาะวิธี HTTP ของเส้นทางเริ่มต้นโดยไม่ลงทะเบียนเส้นทางใหม่
-- `methods`: วิธี HTTP สตริงหรืออาร์เรย์สตริง เช่น `'GET'` หรือ `['GET','POST']`
-- `name`: ชื่อเส้นทางสำหรับ `route('name')` สร้าง URL ข้ามได้
-
-### แอนโนเทชันไม่มีพารามิเตอร์: จำกัดวิธี HTTP ของเส้นทางเริ่มต้น
+### แอนโนเทชันไม่มีพาธ: จำกัดวิธี HTTP ของเส้นทางเริ่มต้น
 
 ไม่มีเส้นทาง จะจำกัดเฉพาะวิธี HTTP ที่อนุญาตสำหรับการดำเนินการนั้น ยังใช้เส้นทางเริ่มต้นอยู่:
 
@@ -208,22 +203,24 @@ public function catchAll($path = null) { ... }
 
 ### มิดเดิลแวร์
 
-`#[Middleware]` บน controller หรือ method จะส่งผลต่อเส้นทางแอนโนเทชัน ใช้เหมือน `support\annotation\Middleware`:
+`#[Middleware]` กำหนดมิดเดิลแวร์บน controller หรือเมธอดได้ สามารถประกาศหลายคลาสพร้อมกัน
 
 ```php
 use support\annotation\Middleware;
+use app\middleware\AuthMiddleware;
+use app\middleware\RateLimitMiddleware;
 
-#[Middleware(\app\middleware\AuthMiddleware::class)]
+#[Middleware(AuthMiddleware::class)]
 class UserController { ... }
 
 #[Get('/user/{id}')]
-#[Middleware(\app\middleware\RateLimitMiddleware::class)]
+#[Middleware(AuthMiddleware::class, RateLimitMiddleware::class)]
 public function show($id) { ... }
 ```
 
-### การสร้าง URL ด้วย route()
+### การสร้าง URL
 
-เมื่อระบุชื่อเส้นทางในแอนโนเทชัน ใช้ `route('name', $params)` เพื่อสร้าง URL:
+หลังตั้งชื่อเส้นทางในแอนโนเทชันแล้ว สร้าง URL ด้วย `route('name', $params)`:
 
 ```php
 #[Get('/user/{id}', 'user.show')]

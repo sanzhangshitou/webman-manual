@@ -109,16 +109,11 @@ class UserController
 }
 ```
 
-Annotazioni disponibili: `#[Get]` `#[Post]` `#[Put]` `#[Delete]` `#[Patch]` `#[Head]` `#[Options]` `#[Any]` (qualsiasi metodo). Il percorso deve iniziare con `/`. Il secondo parametro può specificare il nome della route, usato da `route()` per generare URL.
+Annotazioni disponibili: `#[Get]` `#[Post]` `#[Put]` `#[Delete]` `#[Patch]` `#[Head]` `#[Options]` `#[Any]` (qualsiasi metodo).
 
 `#[DisableDefaultRoute]` disattiva il routing predefinito del controller (opzionale); sono accessibili solo le route definite da annotazioni.
 
-**Sintassi completa `#[Route]`**: `#[Route(path, methods, name)]`
-- `path`: percorso route, inizia con `/`; quando `null` limita solo i metodi HTTP della route predefinita senza registrare nuova route
-- `methods`: metodo/i HTTP, stringa o array di stringhe, es. `'GET'` o `['GET','POST']`
-- `name`: nome route per `route('name')` generazione URL, può essere omesso
-
-### Annotazioni senza parametri: restringere il metodo HTTP sulla route predefinita
+### Annotazioni senza percorso: limitare i metodi HTTP della route predefinita
 
 Senza percorso, limita solo i metodi HTTP consentiti per quell'azione, continuando a usare il percorso predefinito:
 
@@ -192,22 +187,24 @@ Vedi il capitolo «Parametri di Routing» in questo documento.
 
 ### Middleware
 
-`#[Middleware]` su controller o metodo si applica alle route con annotazioni; uso come `support\annotation\Middleware`:
+`#[Middleware]` consente di definire middleware su controller o metodo; è possibile dichiarare più classi insieme.
 
 ```php
 use support\annotation\Middleware;
+use app\middleware\AuthMiddleware;
+use app\middleware\RateLimitMiddleware;
 
-#[Middleware(\app\middleware\AuthMiddleware::class)]
+#[Middleware(AuthMiddleware::class)]
 class UserController { ... }
 
 #[Get('/user/{id}')]
-#[Middleware(\app\middleware\RateLimitMiddleware::class)]
+#[Middleware(AuthMiddleware::class, RateLimitMiddleware::class)]
 public function show($id) { ... }
 ```
 
-### Generazione URL con route()
+### Generazione URL
 
-Quando il nome della route è specificato nell'annotazione, usare `route('name', $params)` per generare l'URL:
+Dopo aver assegnato un nome alla route nell'annotazione, generare l'URL con `route('name', $params)`:
 
 ```php
 #[Get('/user/{id}', 'user.show')]

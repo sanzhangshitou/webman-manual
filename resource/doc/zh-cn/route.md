@@ -190,7 +190,7 @@ public function catchAll($path = null) { ... }
 
 ### 中间件
 
- `#[Middleware]` 可以在控制器或方法上定义中间件，支持同时声明多个中间件。
+`#[Middleware]` 可以在控制器或方法上定义中间件，支持同时声明多个中间件。
 
 ```php
 use support\annotation\Middleware;

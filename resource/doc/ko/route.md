@@ -108,16 +108,11 @@ class UserController
 }
 ```
 
-사용 가능한 어노테이션: `#[Get]` `#[Post]` `#[Put]` `#[Delete]` `#[Patch]` `#[Head]` `#[Options]` `#[Any]` (임의 메서드). 경로는 반드시 `/`로 시작해야 합니다. 두 번째 매개변수로 라우트 이름을 지정할 수 있으며 `route()`로 URL 생성 시 사용합니다.
+사용 가능한 어노테이션: `#[Get]` `#[Post]` `#[Put]` `#[Delete]` `#[Patch]` `#[Head]` `#[Options]` `#[Any]` (임의 메서드).
 
 `#[DisableDefaultRoute]`는 해당 컨트롤러의 기본 라우트를 비활성화합니다(선택사항). 어노테이션으로 정의한 라우트만 접근 가능합니다.
 
-**`#[Route]` 전체 구문**: `#[Route(path, methods, name)]`
-- `path`: 라우트 경로, `/`로 시작；`null`일 때는 기본 라우트의 HTTP 메서드만 제한하고 새 라우트는 등록하지 않음
-- `methods`: HTTP 메서드, 문자열 또는 문자열 배열, 예: `'GET'` 또는 `['GET','POST']`
-- `name`: `route('name')`으로 URL 생성 시 사용하는 라우트 이름, 생략 가능
-
-### 매개변수 없는 어노테이션: 기본 라우트의 HTTP 메서드 제한
+### 경로 없는 어노테이션: 기본 라우트의 HTTP 메서드 제한
 
 경로 없이 사용 시 해당 액션에서 허용되는 HTTP 메서드만 제한하며, 기본 라우트 경로를 계속 사용합니다:
 
@@ -191,22 +186,24 @@ public function catchAll($path = null) { ... }
 
 ### 미들웨어
 
-컨트롤러 또는 메서드의 `#[Middleware]`는 어노테이션 라우트에 적용되며, `support\annotation\Middleware`와 동일하게 사용합니다:
+`#[Middleware]`로 컨트롤러 또는 메서드에 미들웨어를 정의할 수 있으며, 여러 클래스를 한 번에 선언할 수 있습니다.
 
 ```php
 use support\annotation\Middleware;
+use app\middleware\AuthMiddleware;
+use app\middleware\RateLimitMiddleware;
 
-#[Middleware(\app\middleware\AuthMiddleware::class)]
+#[Middleware(AuthMiddleware::class)]
 class UserController { ... }
 
 #[Get('/user/{id}')]
-#[Middleware(\app\middleware\RateLimitMiddleware::class)]
+#[Middleware(AuthMiddleware::class, RateLimitMiddleware::class)]
 public function show($id) { ... }
 ```
 
-### route() URL 생성 연동
+### URL 생성
 
-어노테이션에서 라우트 이름을 지정한 경우, `route('name', $params)`로 URL을 생성할 수 있습니다:
+어노테이션에 라우트 이름을 지정한 뒤 `route('name', $params)`로 URL을 생성합니다:
 
 ```php
 #[Get('/user/{id}', 'user.show')]
