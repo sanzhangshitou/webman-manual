@@ -112,14 +112,9 @@ class UserController
 }
 ```
 
-可用注解：`#[Get]` `#[Post]` `#[Put]` `#[Delete]` `#[Patch]` `#[Head]` `#[Options]` `#[Any]`（任意方法）。路径必须以 `/` 开头。第二参数可指定路由名，用于 `route()` 生成 URL。
+可用注解：`#[Get]` `#[Post]` `#[Put]` `#[Delete]` `#[Patch]` `#[Head]` `#[Options]` `#[Any]`（任意方法）。
 
 `#[DisableDefaultRoute]` 表示该控制器禁用默认路由(可选)，仅通过注解定义的路由可访问。
-
-**`#[Route]` 完整用法**：`#[Route(path, methods, name)]`
-- `path`：路由路径，以 `/` 开头；为 `null` 时仅限制默认路由的请求方法，不注册新路由
-- `methods`：HTTP 方法，字符串或字符串数组，如 `'GET'` 或 `['GET','POST']`
-- `name`：路由名，用于 `route('name')` 生成 URL，可省略
 
 ### 无参数注解：限制默认路由的请求方法
 
@@ -195,20 +190,22 @@ public function catchAll($path = null) { ... }
 
 ### 中间件
 
-控制器或方法上的 `#[Middleware]` 会作用于注解路由，用法同 `support\annotation\Middleware`：
+ `#[Middleware]` 可以在控制器或方法上定义中间件，支持同时声明多个中间件。
 
 ```php
 use support\annotation\Middleware;
+use app\middleware\AuthMiddleware;
+use app\middleware\RateLimitMiddleware;
 
-#[Middleware(\app\middleware\AuthMiddleware::class)]
+#[Middleware(AuthMiddleware::class)]
 class UserController { ... }
 
 #[Get('/user/{id}')]
-#[Middleware(\app\middleware\RateLimitMiddleware::class)]
+#[Middleware(AuthMiddleware::class, RateLimitMiddleware::class)]
 public function show($id) { ... }
 ```
 
-### 与 route() URL 生成的配合
+### 生成URL
 
 在注解中指定路由名后，可通过 `route('name', $params)` 生成 URL：
 
