@@ -8,7 +8,7 @@
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../support/bootstrap.php';
 
-use think\facade\Db;
+use support\think\Db;
 
 $user = Db::table('user')->find(1);
 
